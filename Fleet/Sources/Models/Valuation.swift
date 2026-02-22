@@ -18,7 +18,7 @@ struct Valuation: Codable {
 struct ValuationTrend: Codable {
     var amount: Int
     var direction: TrendDirection
-    var description: String
+    var summary: String
 
     enum TrendDirection: String, Codable {
         case up, down

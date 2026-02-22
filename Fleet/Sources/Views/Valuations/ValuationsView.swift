@@ -178,7 +178,7 @@ struct ValuationCardView: View {
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(isUp ? FleetTheme.accentGreen : FleetTheme.accentRed)
 
-                    Text("\(isUp ? "Up" : "Down") $\(NumberFormatter.currency.string(from: NSNumber(value: valuation.trend.amount)) ?? "") from last month · \(valuation.trend.description)")
+                    Text("\(isUp ? "Up" : "Down") $\(NumberFormatter.currency.string(from: NSNumber(value: valuation.trend.amount)) ?? "") from last month · \(valuation.trend.summary)")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(isUp ? Color(hex: "1A7A56") : Color(hex: "CC2B2B"))
                 }

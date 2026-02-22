@@ -12,8 +12,16 @@ class AuthenticationService: ObservableObject {
 
     private var authStateHandle: AuthStateDidChangeListenerHandle?
 
+    private var firebaseAvailable: Bool { AppDelegate.isFirebaseConfigured }
+
+    private var googleSignInConfigured: Bool {
+        GIDSignIn.sharedInstance.configuration != nil
+    }
+
     init() {
-        listenForAuthState()
+        if firebaseAvailable {
+            listenForAuthState()
+        }
     }
 
     deinit {
@@ -47,6 +55,11 @@ class AuthenticationService: ObservableObject {
     // MARK: - Google Sign-In via Firebase
 
     func signIn() {
+        guard googleSignInConfigured else {
+            errorMessage = "Google Sign-In is not configured. Add GoogleService-Info.plist to enable authentication."
+            return
+        }
+
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let rootViewController = windowScene.windows.first?.rootViewController else {
             errorMessage = "Unable to find root view controller"
@@ -56,47 +69,81 @@ class AuthenticationService: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { [weak self] result, error in
-            Task { @MainActor in
-                guard let self else { return }
+        if firebaseAvailable {
+            GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { [weak self] result, error in
+                Task { @MainActor in
+                    guard let self else { return }
 
-                if let error {
+                    if let error {
+                        self.isLoading = false
+                        self.errorMessage = error.localizedDescription
+                        return
+                    }
+
+                    guard let googleUser = result?.user,
+                          let idToken = googleUser.idToken?.tokenString else {
+                        self.isLoading = false
+                        self.errorMessage = "Failed to get Google credentials"
+                        return
+                    }
+
+                    let credential = GoogleAuthProvider.credential(
+                        withIDToken: idToken,
+                        accessToken: googleUser.accessToken.tokenString
+                    )
+
+                    do {
+                        try await Auth.auth().signIn(with: credential)
+                    } catch {
+                        self.errorMessage = error.localizedDescription
+                    }
                     self.isLoading = false
-                    self.errorMessage = error.localizedDescription
-                    return
                 }
-
-                guard let googleUser = result?.user,
-                      let idToken = googleUser.idToken?.tokenString else {
+            }
+        } else {
+            GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { [weak self] result, error in
+                Task { @MainActor in
+                    guard let self else { return }
                     self.isLoading = false
-                    self.errorMessage = "Failed to get Google credentials"
-                    return
-                }
 
-                let credential = GoogleAuthProvider.credential(
-                    withIDToken: idToken,
-                    accessToken: googleUser.accessToken.tokenString
-                )
+                    if let error {
+                        self.errorMessage = error.localizedDescription
+                        return
+                    }
 
-                do {
-                    try await Auth.auth().signIn(with: credential)
-                } catch {
-                    self.errorMessage = error.localizedDescription
+                    guard let user = result?.user else { return }
+                    self.currentUser = FleetUser(
+                        id: user.userID ?? UUID().uuidString,
+                        name: user.profile?.name ?? "User",
+                        email: user.profile?.email ?? "",
+                        photoURL: user.profile?.imageURL(withDimension: 200)
+                    )
+                    self.isSignedIn = true
                 }
-                self.isLoading = false
             }
         }
     }
 
-    // MARK: - Anonymous Sign-In
+    // MARK: - Anonymous / Demo Sign-In
 
     func signInAnonymously() async {
         isLoading = true
         errorMessage = nil
-        do {
-            try await Auth.auth().signInAnonymously()
-        } catch {
-            errorMessage = error.localizedDescription
+
+        if firebaseAvailable {
+            do {
+                try await Auth.auth().signInAnonymously()
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+        } else {
+            currentUser = FleetUser(
+                id: "demo",
+                name: "Alex Demo",
+                email: "alex@example.com",
+                photoURL: nil
+            )
+            isSignedIn = true
         }
         isLoading = false
     }
@@ -104,11 +151,13 @@ class AuthenticationService: ObservableObject {
     // MARK: - Sign Out
 
     func signOut() {
-        GIDSignIn.sharedInstance.signOut()
-        do {
-            try Auth.auth().signOut()
-        } catch {
-            errorMessage = error.localizedDescription
+        if googleSignInConfigured {
+            GIDSignIn.sharedInstance.signOut()
         }
+        if firebaseAvailable {
+            try? Auth.auth().signOut()
+        }
+        currentUser = nil
+        isSignedIn = false
     }
 }

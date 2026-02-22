@@ -39,7 +39,7 @@ enum SampleData {
                 Recall(
                     id: UUID(),
                     title: "FSD Safety",
-                    description: "Full Self-Driving Beta software recall",
+                    details: "Full Self-Driving Beta software recall",
                     source: "NHTSA",
                     dateIssued: calendar.date(from: DateComponents(year: 2025, month: 12, day: 1))!,
                     isResolved: false
@@ -75,7 +75,7 @@ enum SampleData {
                 tradeIn: 29000,
                 privateSale: 34200,
                 dealer: 37000,
-                trend: ValuationTrend(amount: 800, direction: .up, description: "Market trending ↑"),
+                trend: ValuationTrend(amount: 800, direction: .up, summary: "Market trending ↑"),
                 lastUpdated: Date()
             )
         )
@@ -122,7 +122,7 @@ enum SampleData {
                 tradeIn: 60000,
                 privateSale: 68500,
                 dealer: 72000,
-                trend: ValuationTrend(amount: 1200, direction: .down, description: "Seasonal dip"),
+                trend: ValuationTrend(amount: 1200, direction: .down, summary: "Seasonal dip"),
                 lastUpdated: Date()
             )
         )
@@ -161,7 +161,7 @@ enum SampleData {
                 tradeIn: 28000,
                 privateSale: 32000,
                 dealer: 35000,
-                trend: ValuationTrend(amount: 500, direction: .up, description: "Steady demand"),
+                trend: ValuationTrend(amount: 500, direction: .up, summary: "Steady demand"),
                 lastUpdated: Date()
             )
         )
