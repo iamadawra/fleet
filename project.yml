@@ -40,3 +40,16 @@ targets:
         GENERATE_INFOPLIST_FILE: false
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"
+  FleetTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - FleetTests
+    dependencies:
+      - target: Fleet
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: true
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Fleet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Fleet"
+        BUNDLE_LOADER: "$(TEST_HOST)"
