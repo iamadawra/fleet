@@ -4,6 +4,7 @@ import SwiftData
 struct AddVehicleView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var firestoreService: FirestoreService
     @State private var make = ""
     @State private var model = ""
     @State private var year = ""
@@ -150,6 +151,7 @@ struct AddVehicleView: View {
             )
         )
         modelContext.insert(vehicle)
+        firestoreService.uploadVehicle(vehicle)
         dismiss()
     }
 }
