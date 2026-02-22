@@ -24,22 +24,29 @@ struct FleetApp: App {
     @StateObject private var authService = AuthenticationService()
     @StateObject private var firestoreService = FirestoreService()
     @StateObject private var toastManager = ToastManager()
+    @State private var isLaunching = true
     let modelContainer = ModelContainerConfig.makeContainer()
 
     var body: some Scene {
         WindowGroup {
             Group {
-                if authService.isSignedIn {
+                if isLaunching {
+                    LaunchLoadingView()
+                        .transition(.opacity)
+                } else if authService.isSignedIn {
                     MainTabView()
                         .environmentObject(authService)
                         .environmentObject(firestoreService)
                         .environmentObject(toastManager)
+                        .transition(.opacity)
                 } else {
                     LoginView()
                         .environmentObject(authService)
                         .environmentObject(toastManager)
+                        .transition(.opacity)
                 }
             }
+            .animation(.easeInOut(duration: 0.5), value: isLaunching)
             .toast(toastManager)
             .onOpenURL { url in
                 GIDSignIn.sharedInstance.handle(url)
@@ -49,6 +56,7 @@ struct FleetApp: App {
             }
             .onAppear {
                 checkModelContainerHealth()
+                finishLaunching()
             }
             .onReceive(firestoreService.$listenerError) { error in
                 if let error {
@@ -72,6 +80,22 @@ struct FleetApp: App {
             }
         } else {
             firestoreService.stopListening()
+        }
+    }
+
+    private func finishLaunching() {
+        Task {
+            // Allow Firebase and auth services to initialize.
+            // Keeps the loading screen visible long enough for
+            // network-dependent setup on slow connections.
+            try? await Task.sleep(for: .seconds(2))
+            let deadline = Date().addingTimeInterval(8)
+            while authService.isLoading, Date() < deadline {
+                try? await Task.sleep(for: .milliseconds(250))
+            }
+            withAnimation {
+                isLaunching = false
+            }
         }
     }
 
