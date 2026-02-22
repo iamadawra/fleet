@@ -1,7 +1,12 @@
 import SwiftUI
+import SwiftData
 
 struct AlertsView: View {
-    @EnvironmentObject var garageVM: GarageViewModel
+    @Query private var vehicles: [Vehicle]
+
+    private var upcomingEvents: [FleetEvent] {
+        GarageStatsHelper.upcomingEvents(vehicles)
+    }
 
     var body: some View {
         NavigationStack {
@@ -37,7 +42,7 @@ struct AlertsView: View {
                                 .foregroundColor(FleetTheme.textPrimary)
                                 .padding(.bottom, 14)
 
-                            ForEach(garageVM.upcomingEvents) { event in
+                            ForEach(upcomingEvents) { event in
                                 EventCardView(event: event)
                             }
                         }
@@ -77,7 +82,7 @@ struct AlertsView: View {
                     .padding(.bottom, 6)
 
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("\(garageVM.fleetHealthScore)")
+                    Text("\(GarageStatsHelper.fleetHealthScore(vehicles))")
                         .font(.custom("Georgia", size: 38))
                         .fontWeight(.semibold)
                         .foregroundColor(.white)
@@ -87,15 +92,15 @@ struct AlertsView: View {
                         .foregroundColor(.white.opacity(0.7))
                 }
 
-                Text("\(garageVM.alertCount) items need your attention")
+                Text("\(GarageStatsHelper.alertCount(vehicles)) items need your attention")
                     .font(.system(size: 13))
                     .foregroundColor(.white.opacity(0.75))
                     .padding(.top, 6)
 
                 HStack(spacing: 8) {
-                    SummaryChipView(text: "\(garageVM.vehicles.count) Vehicles")
-                    SummaryChipView(text: "\(garageVM.openRecallCount) Recall\(garageVM.openRecallCount != 1 ? "s" : "")")
-                    SummaryChipView(text: "\(garageVM.expiringCount) Expiry")
+                    SummaryChipView(text: "\(vehicles.count) Vehicles")
+                    SummaryChipView(text: "\(GarageStatsHelper.openRecallCount(vehicles)) Recall\(GarageStatsHelper.openRecallCount(vehicles) != 1 ? "s" : "")")
+                    SummaryChipView(text: "\(GarageStatsHelper.expiringCount(vehicles)) Expiry")
                 }
                 .padding(.top, 18)
             }
