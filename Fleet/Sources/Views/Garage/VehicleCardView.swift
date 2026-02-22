@@ -74,31 +74,40 @@ struct VehicleCardView: View {
 
     @ViewBuilder
     private var vehicleImage: some View {
-        switch vehicle.imageURL {
-        case "tesla_model3":
-            AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=700&q=80&auto=format&fit=crop")) { image in
+        if vehicle.imageURL.hasPrefix("http") {
+            // URL-based image (e.g. from Car and Driver)
+            AsyncImage(url: URL(string: vehicle.imageURL)) { image in
                 image.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
                 Rectangle().fill(FleetTheme.pastelBlue)
             }
-        case "bmw_m4":
-            AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=700&q=80&auto=format&fit=crop")) { image in
-                image.resizable().aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Rectangle().fill(FleetTheme.pastelBlue)
-            }
-        case "jeep_wrangler":
-            AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=700&q=80&auto=format&fit=crop")) { image in
-                image.resizable().aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Rectangle().fill(FleetTheme.pastelMint)
-            }
-        default:
-            ZStack {
-                FleetTheme.pastelLavender
-                Image(systemName: "car.fill")
-                    .font(.system(size: 48))
-                    .foregroundColor(FleetTheme.accentPurple.opacity(0.4))
+        } else {
+            switch vehicle.imageURL {
+            case "tesla_model3":
+                AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=700&q=80&auto=format&fit=crop")) { image in
+                    image.resizable().aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    Rectangle().fill(FleetTheme.pastelBlue)
+                }
+            case "bmw_m4":
+                AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=700&q=80&auto=format&fit=crop")) { image in
+                    image.resizable().aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    Rectangle().fill(FleetTheme.pastelBlue)
+                }
+            case "jeep_wrangler":
+                AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=700&q=80&auto=format&fit=crop")) { image in
+                    image.resizable().aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    Rectangle().fill(FleetTheme.pastelMint)
+                }
+            default:
+                ZStack {
+                    FleetTheme.pastelLavender
+                    Image(systemName: "car.fill")
+                        .font(.system(size: 48))
+                        .foregroundColor(FleetTheme.accentPurple.opacity(0.4))
+                }
             }
         }
     }
