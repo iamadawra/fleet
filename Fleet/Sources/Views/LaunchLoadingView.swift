@@ -8,7 +8,7 @@ struct LaunchLoadingView: View {
     @State private var iconScale: Double = 1.0
     @State private var appeared = false
 
-    private let oneLiners = [
+    static let oneLiners = [
         "Revving up the engine...",
         "Polishing the chrome...",
         "Checking the mirrors...",
@@ -97,7 +97,7 @@ struct LaunchLoadingView: View {
                     .padding(.bottom, 20)
 
                 // Rotating one-liner text
-                Text(oneLiners[currentLineIndex])
+                Text(Self.oneLiners[currentLineIndex])
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(FleetTheme.textSecondary)
                     .opacity(textOpacity)
@@ -125,7 +125,7 @@ struct LaunchLoadingView: View {
 
         // After fade out, change text and fade back in
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            currentLineIndex = (currentLineIndex + 1) % oneLiners.count
+            currentLineIndex = (currentLineIndex + 1) % Self.oneLiners.count
             withAnimation(.easeInOut(duration: 0.3)) {
                 textOpacity = 1
             }

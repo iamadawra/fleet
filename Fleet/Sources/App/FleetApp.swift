@@ -24,29 +24,39 @@ struct FleetApp: App {
     @StateObject private var authService = AuthenticationService()
     @StateObject private var firestoreService = FirestoreService()
     @StateObject private var toastManager = ToastManager()
-    @State private var isLaunching = true
+    @State private var launchPhase: LaunchPhase = .splash
     let modelContainer = ModelContainerConfig.makeContainer()
+
+    enum LaunchPhase: Equatable {
+        case splash, skeleton, ready
+    }
 
     var body: some Scene {
         WindowGroup {
             Group {
-                if isLaunching {
+                switch launchPhase {
+                case .splash:
                     LaunchLoadingView()
                         .transition(.opacity)
-                } else if authService.isSignedIn {
-                    MainTabView()
-                        .environmentObject(authService)
-                        .environmentObject(firestoreService)
-                        .environmentObject(toastManager)
+                case .skeleton:
+                    SkeletonLoadingView()
                         .transition(.opacity)
-                } else {
-                    LoginView()
-                        .environmentObject(authService)
-                        .environmentObject(toastManager)
-                        .transition(.opacity)
+                case .ready:
+                    if authService.isSignedIn {
+                        MainTabView()
+                            .environmentObject(authService)
+                            .environmentObject(firestoreService)
+                            .environmentObject(toastManager)
+                            .transition(.opacity)
+                    } else {
+                        LoginView()
+                            .environmentObject(authService)
+                            .environmentObject(toastManager)
+                            .transition(.opacity)
+                    }
                 }
             }
-            .animation(.easeInOut(duration: 0.5), value: isLaunching)
+            .animation(.easeInOut(duration: 0.5), value: launchPhase)
             .toast(toastManager)
             .onOpenURL { url in
                 GIDSignIn.sharedInstance.handle(url)
@@ -85,16 +95,26 @@ struct FleetApp: App {
 
     private func finishLaunching() {
         Task {
-            // Allow Firebase and auth services to initialize.
-            // Keeps the loading screen visible long enough for
-            // network-dependent setup on slow connections.
+            // Phase 1: Show branded splash while services start up.
             try? await Task.sleep(for: .seconds(2))
+
+            // Phase 2: Transition to skeleton loader that mirrors the app layout.
+            withAnimation {
+                launchPhase = .skeleton
+            }
+
+            // Wait for auth to finish (up to 8 seconds).
             let deadline = Date().addingTimeInterval(8)
             while authService.isLoading, Date() < deadline {
                 try? await Task.sleep(for: .milliseconds(250))
             }
+
+            // Brief pause so the skeleton is visible even on fast connections.
+            try? await Task.sleep(for: .seconds(1))
+
+            // Phase 3: Reveal the real UI.
             withAnimation {
-                isLaunching = false
+                launchPhase = .ready
             }
         }
     }
