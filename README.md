@@ -137,5 +137,3 @@ Fleet/
 ## License
 
 Copyright (C) 2026 Aayush Dawra (@iamadawra). All rights reserved.
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
