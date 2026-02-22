@@ -1,86 +1,143 @@
-# Fleet
+<p align="center">
+  <img src="Fleet/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="120" height="120" alt="Fleet App Icon" style="border-radius: 22px;" />
+</p>
 
-![Version](https://img.shields.io/badge/version-1.0.0-7B5EA7?style=for-the-badge&labelColor=1A1A2E)
-![Platform](https://img.shields.io/badge/platform-iOS_17+-4A90D9?style=for-the-badge&labelColor=1A1A2E)
-![License](https://img.shields.io/badge/license-MIT-2ECC8B?style=for-the-badge&labelColor=1A1A2E)
-![Swift](https://img.shields.io/badge/swift-5.9-F0845C?style=for-the-badge&labelColor=1A1A2E)
+<h1 align="center">Fleet</h1>
 
-**Your garage, beautifully organized.**
+<p align="center">
+  <strong>Your garage, beautifully organized.</strong>
+</p>
 
-Fleet is an iOS app that helps you manage all your vehicles in one place — track registrations, insurance, recalls, maintenance, and KBB valuations.
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-7B5EA7?style=flat-square&labelColor=1A1A2E" alt="Version" />
+  <img src="https://img.shields.io/badge/platform-iOS_17+-4A90D9?style=flat-square&labelColor=1A1A2E" alt="Platform" />
+  <img src="https://img.shields.io/badge/swift-5.9-F0845C?style=flat-square&labelColor=1A1A2E" alt="Swift" />
+  <img src="https://img.shields.io/badge/license-MIT-2ECC8B?style=flat-square&labelColor=1A1A2E" alt="License" />
+</p>
+
+<br />
+
+Fleet is an iOS app for car owners who want a single, beautiful place to manage everything about their vehicles — registrations, insurance, NHTSA recalls, service history, and live KBB valuations.
+
+Built with SwiftUI and designed around a soft pastel aesthetic with glass-morphism cards and fluid gradients.
+
+---
 
 ## Features
 
-- **Multi-Vehicle Garage** — Track every car you own with high-res photos and at-a-glance status
-- **Smart Reminders** — Never miss a registration, insurance renewal, or maintenance window
-- **Recall Alerts** — Instant NHTSA recall notifications tied directly to your VIN
-- **Live KBB Valuation** — Real-time trade-in and private sale estimates updated monthly
-- **Fleet Health Score** — See your overall fleet status at a glance
-- **Google Sign-In** — Secure authentication with your Google account
+<table>
+  <tr>
+    <td width="60" align="center">🏎️</td>
+    <td><strong>Multi-Vehicle Garage</strong><br/>Track every car you own with high-res photos and at-a-glance status badges.</td>
+  </tr>
+  <tr>
+    <td align="center">📋</td>
+    <td><strong>Smart Reminders</strong><br/>Never miss a registration, insurance renewal, or maintenance window.</td>
+  </tr>
+  <tr>
+    <td align="center">⚠️</td>
+    <td><strong>Recall Alerts</strong><br/>Instant NHTSA recall notifications tied directly to your VIN.</td>
+  </tr>
+  <tr>
+    <td align="center">💰</td>
+    <td><strong>Live KBB Valuation</strong><br/>Real-time trade-in, private sale, and dealer estimates updated monthly.</td>
+  </tr>
+  <tr>
+    <td align="center">💚</td>
+    <td><strong>Fleet Health Score</strong><br/>A single 0–100 score that tells you how on-top-of-things you are.</td>
+  </tr>
+  <tr>
+    <td align="center">🔐</td>
+    <td><strong>Google Sign-In</strong><br/>Secure authentication — no passwords to remember.</td>
+  </tr>
+</table>
 
-## Screenshots
+---
 
-The app includes four primary screens:
+## Screens
 
 | Garage Home | Car Detail | Alerts & Timeline | KBB Valuations |
 |:-----------:|:----------:|:-----------------:|:--------------:|
-| Vehicle cards with status badges | Registration, insurance, recalls, service history | Fleet health score, upcoming events | Trade-in, private sale, dealer estimates |
+| Vehicle cards with status badges, alert chips, and quick-glance stats | Registration, insurance, recalls, and full service history timeline | Fleet health score with upcoming deadlines across all vehicles | Per-vehicle trade-in, private sale, and dealer range with trend data |
+
+**Additional screens:** Login (Google Sign-In + demo mode), Profile & Settings, Add Vehicle (VIN scan + manual entry)
+
+---
 
 ## Getting Started
 
 ### Prerequisites
 
-- Xcode 15.0+
-- iOS 17.0+
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen) (for project generation)
+| Tool | Version |
+|------|---------|
+| Xcode | 15.0+ |
+| iOS Deployment Target | 17.0+ |
+| [XcodeGen](https://github.com/yonaskolb/XcodeGen) | Latest |
 
-### Setup
+### Quick Start
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/iamadawra/fleet.git
-   cd fleet
-   ```
+```bash
+git clone https://github.com/iamadawra/fleet.git
+cd fleet
+brew install xcodegen    # if not already installed
+xcodegen generate
+open Fleet.xcodeproj
+```
 
-2. Generate the Xcode project:
-   ```bash
-   xcodegen generate
-   ```
+Build and run on a simulator or device. The app ships with sample data (Tesla Model 3, BMW M4, Jeep Wrangler) so you can explore every screen immediately.
 
-3. Open `Fleet.xcodeproj` in Xcode
+> Tap **Skip for now** on the login screen to bypass Google Sign-In during development.
 
-4. **Google Sign-In Setup** (optional):
-   - Create a project in [Google Cloud Console](https://console.cloud.google.com)
-   - Enable Google Sign-In and create an OAuth 2.0 client ID for iOS
-   - Replace `PLACEHOLDER-REVERSED-CLIENT-ID` in `Info.plist` with your reversed client ID
-   - Add your `GoogleService-Info.plist` to `Fleet/Resources/`
+### Google Sign-In Setup
 
-5. Build and run on a simulator or device
+To enable real authentication:
 
-> **Note:** The app includes a "Skip for now" option on the login screen for demo purposes.
+1. Create a project in [Google Cloud Console](https://console.cloud.google.com)
+2. Enable the Google Sign-In API and create an OAuth 2.0 client ID for iOS
+3. Replace `PLACEHOLDER-REVERSED-CLIENT-ID` in `Fleet/Resources/Info.plist`
+4. Add your `GoogleService-Info.plist` to `Fleet/Resources/`
+
+---
 
 ## Architecture
 
 ```
 Fleet/
 ├── Sources/
-│   ├── App/              # App entry point
-│   ├── Models/           # Data models (Vehicle, Registration, etc.)
-│   ├── Views/            # SwiftUI views
-│   │   ├── Auth/         # Login & authentication
-│   │   ├── Garage/       # Garage home & vehicle cards
-│   │   ├── Detail/       # Car detail & status cards
-│   │   ├── Alerts/       # Alerts & upcoming events
-│   │   ├── Valuations/   # KBB valuation cards
-│   │   └── Profile/      # User profile & settings
-│   ├── ViewModels/       # View models
-│   ├── Services/         # Auth service & sample data
-│   └── Theme/            # Colors, gradients, styling
+│   ├── App/                  FleetApp entry point
+│   ├── Models/               Vehicle, Registration, Insurance, Recall,
+│   │                         Maintenance, Valuation, FleetEvent, User
+│   ├── Views/
+│   │   ├── Auth/             LoginView
+│   │   ├── Garage/           GarageHomeView, VehicleCardView, AddVehicleView
+│   │   ├── Detail/           CarDetailView, StatusCardView
+│   │   ├── Alerts/           AlertsView, EventCardView
+│   │   ├── Valuations/       ValuationsView, ValuationCardView
+│   │   └── Profile/          ProfileView
+│   ├── ViewModels/           GarageViewModel
+│   ├── Services/             AuthenticationService, SampleData
+│   └── Theme/                FleetTheme (colors, gradients, constants)
 └── Resources/
-    ├── Assets.xcassets/  # App icon & colors
-    └── Info.plist        # App configuration
+    ├── Assets.xcassets/      App icon, accent color
+    └── Info.plist             URL schemes, launch screen config
 ```
+
+**Design system:** Pastel palette (lavender, mint, peach, rose, sky) with accent purple `#7B5EA7`, accent blue `#4A90D9`, and accent green `#2ECC8B`. Cards use 22 pt corner radii, soft shadows, and glass-morphism backgrounds.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| UI | SwiftUI |
+| Auth | [Google Sign-In for iOS](https://github.com/google/GoogleSignIn-iOS) 8.0+ |
+| Dependencies | Swift Package Manager |
+| Project Gen | [XcodeGen](https://github.com/yonaskolb/XcodeGen) |
+| Min Target | iOS 17.0 |
+
+---
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
