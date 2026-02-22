@@ -190,7 +190,6 @@ struct AddVehicleView: View {
 
         let trimmedMake = make.trimmingCharacters(in: .whitespaces)
         let trimmedModel = model.trimmingCharacters(in: .whitespaces)
-
         if trimmedMake.isEmpty {
             errors.append("Make is required.")
         }
