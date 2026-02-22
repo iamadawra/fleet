@@ -1,8 +1,9 @@
 import SwiftUI
+import SwiftData
 
 struct ProfileView: View {
     @EnvironmentObject var authService: AuthenticationService
-    @EnvironmentObject var garageVM: GarageViewModel
+    @Query private var vehicles: [Vehicle]
 
     var body: some View {
         NavigationStack {
@@ -39,11 +40,11 @@ struct ProfileView: View {
 
                         // Stats row
                         HStack(spacing: 0) {
-                            profileStat(value: "\(garageVM.vehicles.count)", label: "Vehicles")
+                            profileStat(value: "\(vehicles.count)", label: "Vehicles")
                             Divider().frame(height: 30)
-                            profileStat(value: "\(garageVM.alertCount)", label: "Alerts")
+                            profileStat(value: "\(GarageStatsHelper.alertCount(vehicles))", label: "Alerts")
                             Divider().frame(height: 30)
-                            profileStat(value: garageVM.formattedTotalFleetValue, label: "Fleet Value")
+                            profileStat(value: GarageStatsHelper.formattedTotalFleetValue(vehicles), label: "Fleet Value")
                         }
                         .padding(.vertical, 16)
                         .background(.white.opacity(0.7))

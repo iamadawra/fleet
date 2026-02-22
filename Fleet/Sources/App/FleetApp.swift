@@ -1,10 +1,11 @@
 import SwiftUI
+import SwiftData
 import GoogleSignIn
 
 @main
 struct FleetApp: App {
     @StateObject private var authService = AuthenticationService()
-    @StateObject private var garageVM = GarageViewModel()
+    let modelContainer = ModelContainerConfig.makeContainer()
 
     var body: some Scene {
         WindowGroup {
@@ -12,10 +13,6 @@ struct FleetApp: App {
                 if authService.isSignedIn {
                     MainTabView()
                         .environmentObject(authService)
-                        .environmentObject(garageVM)
-                        .onAppear {
-                            garageVM.loadSampleData()
-                        }
                 } else {
                     LoginView()
                         .environmentObject(authService)
@@ -25,5 +22,6 @@ struct FleetApp: App {
                 GIDSignIn.sharedInstance.handle(url)
             }
         }
+        .modelContainer(modelContainer)
     }
 }

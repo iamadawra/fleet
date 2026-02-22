@@ -1,10 +1,14 @@
 import SwiftUI
+import SwiftData
 
 struct GarageHomeView: View {
-    @EnvironmentObject var garageVM: GarageViewModel
+    @Query private var vehicles: [Vehicle]
     @EnvironmentObject var authService: AuthenticationService
+    @Environment(\.modelContext) private var modelContext
     @State private var selectedVehicle: Vehicle?
     @State private var showAddVehicle = false
+    @State private var vehicleToDelete: Vehicle?
+    @State private var showDeleteConfirmation = false
 
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -33,7 +37,7 @@ struct GarageHomeView: View {
                                 .fontWeight(.semibold)
                                 .foregroundColor(FleetTheme.textPrimary)
 
-                            Text("\(garageVM.vehicles.count) vehicles · \(garageVM.alertCount) alerts pending")
+                            Text("\(vehicles.count) vehicles · \(GarageStatsHelper.alertCount(vehicles)) alerts pending")
                                 .font(.system(size: 14))
                                 .foregroundColor(FleetTheme.textSecondary)
                         }
@@ -53,11 +57,19 @@ struct GarageHomeView: View {
                         .padding(.bottom, 20)
 
                         // Vehicle cards
-                        ForEach(garageVM.vehicles) { vehicle in
+                        ForEach(vehicles) { vehicle in
                             NavigationLink(value: vehicle) {
                                 VehicleCardView(vehicle: vehicle)
                             }
                             .buttonStyle(.plain)
+                            .contextMenu {
+                                Button(role: .destructive) {
+                                    vehicleToDelete = vehicle
+                                    showDeleteConfirmation = true
+                                } label: {
+                                    Label("Delete Vehicle", systemImage: "trash")
+                                }
+                            }
                         }
 
                         // Add vehicle button
@@ -95,12 +107,27 @@ struct GarageHomeView: View {
             .sheet(isPresented: $showAddVehicle) {
                 AddVehicleView()
             }
+            .alert("Delete Vehicle", isPresented: $showDeleteConfirmation) {
+                Button("Cancel", role: .cancel) {
+                    vehicleToDelete = nil
+                }
+                Button("Delete", role: .destructive) {
+                    if let vehicle = vehicleToDelete {
+                        modelContext.delete(vehicle)
+                    }
+                    vehicleToDelete = nil
+                }
+            } message: {
+                if let vehicle = vehicleToDelete {
+                    Text("Are you sure you want to delete \(vehicle.displayName)? This cannot be undone.")
+                }
+            }
         }
     }
 
     private var alertChips: [AlertChip] {
         var chips: [AlertChip] = []
-        for vehicle in garageVM.vehicles {
+        for vehicle in vehicles {
             let openRecalls = vehicle.recalls.filter { !$0.isResolved }
             if !openRecalls.isEmpty {
                 chips.append(AlertChip(type: .urgent, text: "Recall: \(vehicle.make)"))
@@ -109,9 +136,8 @@ struct GarageHomeView: View {
                 chips.append(AlertChip(type: .warning, text: "Reg due in \(vehicle.registration.daysUntilExpiry)d"))
             }
         }
-        // Add "OK" chips
-        let allInsuranceOK = garageVM.vehicles.allSatisfy { $0.insurance.isActive }
-        if allInsuranceOK {
+        let allInsuranceOK = vehicles.allSatisfy { $0.insurance.isActive }
+        if allInsuranceOK && !vehicles.isEmpty {
             chips.append(AlertChip(type: .ok, text: "Insurance OK"))
         }
         chips.append(AlertChip(type: .ok, text: "Oil change OK"))

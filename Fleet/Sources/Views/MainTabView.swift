@@ -1,8 +1,9 @@
 import SwiftUI
+import SwiftData
 
 struct MainTabView: View {
-    @EnvironmentObject var garageVM: GarageViewModel
     @State private var selectedTab = 0
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -31,5 +32,8 @@ struct MainTabView: View {
                 .tag(3)
         }
         .tint(FleetTheme.accentPurple)
+        .onAppear {
+            SampleData.seedIfEmpty(context: modelContext)
+        }
     }
 }

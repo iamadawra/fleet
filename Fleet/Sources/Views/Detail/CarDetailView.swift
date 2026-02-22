@@ -1,8 +1,11 @@
 import SwiftUI
+import SwiftData
 
 struct CarDetailView: View {
     let vehicle: Vehicle
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @State private var showDeleteConfirmation = false
 
     var body: some View {
         ZStack {
@@ -55,13 +58,15 @@ struct CarDetailView: View {
                             .padding(.bottom, 22)
 
                         // Service history
-                        Text("Service History")
-                            .font(.custom("Georgia", size: 18))
-                            .fontWeight(.medium)
-                            .foregroundColor(FleetTheme.textPrimary)
-                            .padding(.bottom, 14)
+                        if !vehicle.maintenanceRecords.isEmpty {
+                            Text("Service History")
+                                .font(.custom("Georgia", size: 18))
+                                .fontWeight(.medium)
+                                .foregroundColor(FleetTheme.textPrimary)
+                                .padding(.bottom, 14)
 
-                        serviceTimeline
+                            serviceTimeline
+                        }
                     }
                     .padding(.horizontal, 22)
                     .padding(.bottom, 40)
@@ -84,16 +89,33 @@ struct CarDetailView: View {
                 }
             }
             ToolbarItem(placement: .navigationBarTrailing) {
-                Circle()
-                    .fill(.white.opacity(0.85))
-                    .frame(width: 36, height: 36)
-                    .overlay(
-                        Image(systemName: "ellipsis")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(FleetTheme.textPrimary)
-                    )
-                    .shadow(color: .black.opacity(0.12), radius: 4, y: 2)
+                Menu {
+                    Button(role: .destructive) {
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Delete Vehicle", systemImage: "trash")
+                    }
+                } label: {
+                    Circle()
+                        .fill(.white.opacity(0.85))
+                        .frame(width: 36, height: 36)
+                        .overlay(
+                            Image(systemName: "ellipsis")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(FleetTheme.textPrimary)
+                        )
+                        .shadow(color: .black.opacity(0.12), radius: 4, y: 2)
+                }
             }
+        }
+        .alert("Delete Vehicle", isPresented: $showDeleteConfirmation) {
+            Button("Cancel", role: .cancel) {}
+            Button("Delete", role: .destructive) {
+                modelContext.delete(vehicle)
+                dismiss()
+            }
+        } message: {
+            Text("Are you sure you want to delete \(vehicle.displayName)? This cannot be undone.")
         }
     }
 
@@ -120,19 +142,32 @@ struct CarDetailView: View {
 
     @ViewBuilder
     private var vehicleImage: some View {
-        let urlString: String = {
-            switch vehicle.imageURL {
-            case "tesla_model3": return "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=700&q=80&auto=format&fit=crop"
-            case "bmw_m4": return "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=700&q=80&auto=format&fit=crop"
-            case "jeep_wrangler": return "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=700&q=80&auto=format&fit=crop"
-            default: return ""
+        switch vehicle.imageURL {
+        case "tesla_model3":
+            AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=700&q=80&auto=format&fit=crop")) { image in
+                image.resizable().aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle().fill(FleetTheme.pastelBlue)
             }
-        }()
-
-        AsyncImage(url: URL(string: urlString)) { image in
-            image.resizable().aspectRatio(contentMode: .fill)
-        } placeholder: {
-            Rectangle().fill(FleetTheme.pastelBlue)
+        case "bmw_m4":
+            AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=700&q=80&auto=format&fit=crop")) { image in
+                image.resizable().aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle().fill(FleetTheme.pastelBlue)
+            }
+        case "jeep_wrangler":
+            AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=700&q=80&auto=format&fit=crop")) { image in
+                image.resizable().aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle().fill(FleetTheme.pastelMint)
+            }
+        default:
+            ZStack {
+                FleetTheme.pastelLavender
+                Image(systemName: "car.fill")
+                    .font(.system(size: 64))
+                    .foregroundColor(FleetTheme.accentPurple.opacity(0.4))
+            }
         }
     }
 
