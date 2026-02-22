@@ -8,6 +8,10 @@ struct AlertsView: View {
         GarageStatsHelper.upcomingEvents(vehicles)
     }
 
+    private func vehicle(for event: FleetEvent) -> Vehicle? {
+        vehicles.first { $0.id == event.vehicleId }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -43,13 +47,23 @@ struct AlertsView: View {
                                 .padding(.bottom, 14)
 
                             ForEach(upcomingEvents) { event in
-                                EventCardView(event: event)
+                                if let vehicle = vehicle(for: event) {
+                                    NavigationLink(value: vehicle) {
+                                        EventCardView(event: event)
+                                    }
+                                    .buttonStyle(.plain)
+                                } else {
+                                    EventCardView(event: event)
+                                }
                             }
                         }
                         .padding(.horizontal, 18)
                         .padding(.bottom, 40)
                     }
                 }
+            }
+            .navigationDestination(for: Vehicle.self) { vehicle in
+                CarDetailView(vehicle: vehicle)
             }
         }
     }
