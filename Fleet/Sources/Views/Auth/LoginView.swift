@@ -105,15 +105,11 @@ struct LoginView: View {
                         .padding(.top, 8)
                 }
 
-                // Skip for demo
+                // Skip for demo — uses Firebase anonymous auth
                 Button("Skip for now") {
-                    authService.currentUser = FleetUser(
-                        id: "demo",
-                        name: "Alex Demo",
-                        email: "alex@example.com",
-                        photoURL: nil
-                    )
-                    authService.isSignedIn = true
+                    Task {
+                        await authService.signInAnonymously()
+                    }
                 }
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(FleetTheme.textTertiary)
