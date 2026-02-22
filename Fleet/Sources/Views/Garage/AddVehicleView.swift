@@ -199,16 +199,16 @@ struct AddVehicleView: View {
     private func validateForm() -> [String] {
         var errors: [String] = []
 
-        if make.trimmingCharacters(in: .whitespaces).isEmpty {
+        let trimmedMake = make.trimmingCharacters(in: .whitespaces)
+        let trimmedModel = model.trimmingCharacters(in: .whitespaces)
+        if trimmedMake.isEmpty {
             errors.append("Make is required.")
         }
-        if model.trimmingCharacters(in: .whitespaces).isEmpty {
+        if trimmedModel.isEmpty {
             errors.append("Model is required.")
         }
-
-        let currentYear = Calendar.current.component(.year, from: Date())
-        if year < 1886 || year > currentYear + 2 {
-            errors.append("Year must be between 1886 and \(currentYear + 2).")
+        if year < 1886 || year > Calendar.current.component(.year, from: Date()) + 2 {
+            errors.append("Year must be between 1886 and \(Calendar.current.component(.year, from: Date()) + 2).")
         }
 
         let cleanedMileage = mileage.replacingOccurrences(of: ",", with: "").trimmingCharacters(in: .whitespaces)
