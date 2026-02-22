@@ -42,14 +42,20 @@ struct ValuationsView: View {
 
                         // Valuation cards
                         ForEach(vehicles.filter { $0.valuation != nil }) { vehicle in
-                            ValuationCardView(vehicle: vehicle)
-                                .padding(.horizontal, 18)
-                                .padding(.bottom, 18)
+                            NavigationLink(value: vehicle) {
+                                ValuationCardView(vehicle: vehicle)
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 18)
+                            .padding(.bottom, 18)
                         }
 
                         Spacer(minLength: 40)
                     }
                 }
+            }
+            .navigationDestination(for: Vehicle.self) { vehicle in
+                CarDetailView(vehicle: vehicle)
             }
         }
     }
