@@ -1,6 +1,18 @@
 import Foundation
+import SwiftData
 
 enum SampleData {
+    @MainActor
+    static func seedIfEmpty(context: ModelContext) {
+        let descriptor = FetchDescriptor<Vehicle>()
+        let count = (try? context.fetchCount(descriptor)) ?? 0
+        guard count == 0 else { return }
+
+        for vehicle in createSampleVehicles() {
+            context.insert(vehicle)
+        }
+    }
+
     static func createSampleVehicles() -> [Vehicle] {
         let calendar = Calendar.current
 
@@ -155,41 +167,5 @@ enum SampleData {
         )
 
         return [tesla, bmw, jeep]
-    }
-
-    static func createUpcomingEvents() -> [FleetEvent] {
-        let calendar = Calendar.current
-        return [
-            FleetEvent(
-                title: "Registration Renewal",
-                vehicleName: "Jeep Wrangler · 2020",
-                date: calendar.date(from: DateComponents(year: 2026, month: 3, day: 15))!,
-                category: .registration
-            ),
-            FleetEvent(
-                title: "Tesla Recall Service",
-                vehicleName: "Tesla Model 3 · FSD Safety",
-                date: calendar.date(from: DateComponents(year: 2026, month: 3, day: 22))!,
-                category: .recall
-            ),
-            FleetEvent(
-                title: "Tire Rotation",
-                vehicleName: "Tesla Model 3 · 30,000 mi",
-                date: calendar.date(from: DateComponents(year: 2026, month: 4, day: 8))!,
-                category: .maintenance
-            ),
-            FleetEvent(
-                title: "Insurance Renewal",
-                vehicleName: "BMW M4 · State Farm",
-                date: calendar.date(from: DateComponents(year: 2026, month: 6, day: 30))!,
-                category: .insurance
-            ),
-            FleetEvent(
-                title: "Brake Fluid Change",
-                vehicleName: "BMW M4 · 45,000 mi",
-                date: calendar.date(from: DateComponents(year: 2026, month: 7, day: 15))!,
-                category: .maintenance
-            )
-        ]
     }
 }

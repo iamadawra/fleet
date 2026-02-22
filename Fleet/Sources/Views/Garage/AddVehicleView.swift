@@ -1,7 +1,9 @@
 import SwiftUI
+import SwiftData
 
 struct AddVehicleView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     @State private var make = ""
     @State private var model = ""
     @State private var year = ""
@@ -9,6 +11,18 @@ struct AddVehicleView: View {
     @State private var color = ""
     @State private var vin = ""
     @State private var mileage = ""
+    @State private var registrationExpiry = Calendar.current.date(byAdding: .year, value: 1, to: Date())!
+    @State private var registrationState = ""
+    @State private var insuranceProvider = ""
+    @State private var insuranceCoverage = "Full"
+    @State private var insuranceExpiry = Calendar.current.date(byAdding: .year, value: 1, to: Date())!
+
+    private var isFormValid: Bool {
+        !make.trimmingCharacters(in: .whitespaces).isEmpty &&
+        !model.trimmingCharacters(in: .whitespaces).isEmpty &&
+        !year.trimmingCharacters(in: .whitespaces).isEmpty &&
+        Int(year) != nil
+    }
 
     var body: some View {
         NavigationStack {
@@ -45,7 +59,7 @@ struct AddVehicleView: View {
                             Rectangle().fill(FleetTheme.textTertiary.opacity(0.3)).frame(height: 1)
                         }
 
-                        // Form fields
+                        // Vehicle info fields
                         VStack(spacing: 14) {
                             FleetTextField(title: "VIN", text: $vin, placeholder: "17-character VIN")
                             HStack(spacing: 14) {
@@ -66,8 +80,21 @@ struct AddVehicleView: View {
                         .clipShape(RoundedRectangle(cornerRadius: FleetTheme.cardRadius))
                         .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
 
+                        // Registration & Insurance fields
+                        VStack(spacing: 14) {
+                            FleetTextField(title: "Registration State", text: $registrationState, placeholder: "e.g. CA")
+                            FleetDateField(title: "Registration Expiry", date: $registrationExpiry)
+                            FleetTextField(title: "Insurance Provider", text: $insuranceProvider, placeholder: "e.g. State Farm")
+                            FleetTextField(title: "Insurance Coverage", text: $insuranceCoverage, placeholder: "Full")
+                            FleetDateField(title: "Insurance Expiry", date: $insuranceExpiry)
+                        }
+                        .padding(20)
+                        .background(.white.opacity(0.7))
+                        .clipShape(RoundedRectangle(cornerRadius: FleetTheme.cardRadius))
+                        .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
+
                         // Add button
-                        Button(action: { dismiss() }) {
+                        Button(action: saveVehicle) {
                             Text("Add Vehicle")
                                 .font(.system(size: 17, weight: .semibold))
                                 .foregroundColor(.white)
@@ -75,14 +102,17 @@ struct AddVehicleView: View {
                                 .frame(height: 56)
                                 .background(
                                     LinearGradient(
-                                        colors: [FleetTheme.accentPurple, FleetTheme.accentBlue],
+                                        colors: isFormValid
+                                            ? [FleetTheme.accentPurple, FleetTheme.accentBlue]
+                                            : [Color.gray.opacity(0.4), Color.gray.opacity(0.3)],
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
                                 )
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
-                                .shadow(color: FleetTheme.accentPurple.opacity(0.35), radius: 12, y: 6)
+                                .shadow(color: isFormValid ? FleetTheme.accentPurple.opacity(0.35) : .clear, radius: 12, y: 6)
                         }
+                        .disabled(!isFormValid)
                         .padding(.top, 8)
                     }
                     .padding(18)
@@ -97,6 +127,30 @@ struct AddVehicleView: View {
                 }
             }
         }
+    }
+
+    private func saveVehicle() {
+        let vehicle = Vehicle(
+            make: make.trimmingCharacters(in: .whitespaces),
+            model: model.trimmingCharacters(in: .whitespaces),
+            year: Int(year) ?? 2024,
+            trim: trim.trimmingCharacters(in: .whitespaces),
+            color: color.trimmingCharacters(in: .whitespaces),
+            mileage: Int(mileage.replacingOccurrences(of: ",", with: "")) ?? 0,
+            vin: vin.trimmingCharacters(in: .whitespaces),
+            imageURL: "",
+            registration: RegistrationInfo(
+                expiryDate: registrationExpiry,
+                state: registrationState.trimmingCharacters(in: .whitespaces)
+            ),
+            insurance: InsuranceInfo(
+                provider: insuranceProvider.trimmingCharacters(in: .whitespaces),
+                coverageType: insuranceCoverage.trimmingCharacters(in: .whitespaces),
+                expiryDate: insuranceExpiry
+            )
+        )
+        modelContext.insert(vehicle)
+        dismiss()
     }
 }
 
@@ -115,6 +169,31 @@ struct FleetTextField: View {
                 .font(.system(size: 15))
                 .padding(.horizontal, 14)
                 .padding(.vertical, 12)
+                .background(Color.white.opacity(0.8))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(Color.black.opacity(0.08), lineWidth: 1)
+                )
+        }
+    }
+}
+
+struct FleetDateField: View {
+    let title: String
+    @Binding var date: Date
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title.uppercased())
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundColor(FleetTheme.textTertiary)
+                .kerning(1)
+            DatePicker("", selection: $date, displayedComponents: .date)
+                .labelsHidden()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 6)
                 .background(Color.white.opacity(0.8))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay(

@@ -1,7 +1,8 @@
 import SwiftUI
+import SwiftData
 
 struct ValuationsView: View {
-    @EnvironmentObject var garageVM: GarageViewModel
+    @Query private var vehicles: [Vehicle]
 
     var body: some View {
         NavigationStack {
@@ -29,7 +30,7 @@ struct ValuationsView: View {
                                     .font(.system(size: 11, weight: .semibold))
                                     .foregroundColor(FleetTheme.textTertiary)
                                     .kerning(1)
-                                Text(garageVM.formattedTotalFleetValue)
+                                Text(GarageStatsHelper.formattedTotalFleetValue(vehicles))
                                     .font(.custom("Georgia", size: 22))
                                     .fontWeight(.semibold)
                                     .foregroundColor(FleetTheme.accentPurple)
@@ -40,7 +41,7 @@ struct ValuationsView: View {
                         .padding(.bottom, 18)
 
                         // Valuation cards
-                        ForEach(garageVM.vehicles.filter { $0.valuation != nil }) { vehicle in
+                        ForEach(vehicles.filter { $0.valuation != nil }) { vehicle in
                             ValuationCardView(vehicle: vehicle)
                                 .padding(.horizontal, 18)
                                 .padding(.bottom, 18)
@@ -198,19 +199,32 @@ struct ValuationCardView: View {
 
     @ViewBuilder
     private var vehicleImage: some View {
-        let urlString: String = {
-            switch vehicle.imageURL {
-            case "tesla_model3": return "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=700&q=80&auto=format&fit=crop"
-            case "bmw_m4": return "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=700&q=80&auto=format&fit=crop"
-            case "jeep_wrangler": return "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=700&q=80&auto=format&fit=crop"
-            default: return ""
+        switch vehicle.imageURL {
+        case "tesla_model3":
+            AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=700&q=80&auto=format&fit=crop")) { image in
+                image.resizable().aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle().fill(FleetTheme.pastelBlue)
             }
-        }()
-
-        AsyncImage(url: URL(string: urlString)) { image in
-            image.resizable().aspectRatio(contentMode: .fill)
-        } placeholder: {
-            Rectangle().fill(FleetTheme.pastelBlue)
+        case "bmw_m4":
+            AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=700&q=80&auto=format&fit=crop")) { image in
+                image.resizable().aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle().fill(FleetTheme.pastelBlue)
+            }
+        case "jeep_wrangler":
+            AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=700&q=80&auto=format&fit=crop")) { image in
+                image.resizable().aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle().fill(FleetTheme.pastelMint)
+            }
+        default:
+            ZStack {
+                FleetTheme.pastelLavender
+                Image(systemName: "car.fill")
+                    .font(.system(size: 48))
+                    .foregroundColor(FleetTheme.accentPurple.opacity(0.4))
+            }
         }
     }
 }
