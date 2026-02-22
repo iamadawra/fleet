@@ -47,7 +47,8 @@ enum GarageStatsHelper {
                     title: "Registration Renewal",
                     vehicleName: "\(label) · \(vehicle.year)",
                     date: vehicle.registration.expiryDate,
-                    category: .registration
+                    category: .registration,
+                    vehicleId: vehicle.id
                 ))
             }
 
@@ -57,7 +58,8 @@ enum GarageStatsHelper {
                     title: "Insurance Renewal",
                     vehicleName: "\(label) · \(vehicle.insurance.provider)",
                     date: vehicle.insurance.expiryDate,
-                    category: .insurance
+                    category: .insurance,
+                    vehicleId: vehicle.id
                 ))
             }
 
@@ -67,7 +69,8 @@ enum GarageStatsHelper {
                     title: recall.title,
                     vehicleName: "\(label) · \(recall.source)",
                     date: recall.dateIssued,
-                    category: .recall
+                    category: .recall,
+                    vehicleId: vehicle.id
                 ))
             }
 
@@ -78,7 +81,8 @@ enum GarageStatsHelper {
                     title: record.title,
                     vehicleName: "\(label) · \(mileageStr)",
                     date: record.date,
-                    category: .maintenance
+                    category: .maintenance,
+                    vehicleId: vehicle.id
                 ))
             }
         }

@@ -6,6 +6,7 @@ struct FleetEvent: Identifiable {
     var vehicleName: String
     var date: Date
     var category: EventCategory
+    var vehicleId: UUID
 
     var day: String {
         let fmt = DateFormatter()
