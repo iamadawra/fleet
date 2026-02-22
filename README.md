@@ -51,10 +51,6 @@ Built with SwiftUI and designed around a soft pastel aesthetic with glass-morphi
 
 ## Features
 
-<p align="center">
-  <img src="assets/fleet-features.png" width="800" alt="Fleet Features" />
-</p>
-
 <table>
   <tr>
     <td width="60" align="center">🏎️</td>

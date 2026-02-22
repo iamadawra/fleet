@@ -27,6 +27,9 @@ Package.resolved
 # CocoaPods
 Pods/
 
+# Generated project (regenerate with xcodegen)
+*.xcodeproj/
+
 # Misc
 .DS_Store
 *.swp
