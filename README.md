@@ -29,26 +29,6 @@ Built with SwiftUI and designed around a soft pastel aesthetic with glass-morphi
 
 ---
 
-## Screens
-
-<p align="center">
-  <img src="assets/01-garage-home.png" width="220" alt="Garage Home" />
-  &nbsp;&nbsp;
-  <img src="assets/02-car-detail.png" width="220" alt="Car Detail" />
-  &nbsp;&nbsp;
-  <img src="assets/03-alerts-timeline.png" width="220" alt="Alerts & Timeline" />
-  &nbsp;&nbsp;
-  <img src="assets/04-kbb-valuations.png" width="220" alt="KBB Valuations" />
-</p>
-
-<p align="center">
-  <sub>Garage Home&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Car Detail&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alerts & Timeline&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KBB Valuations</sub>
-</p>
-
-**Additional screens:** Login (Google Sign-In + demo mode) · Profile & Settings · Add Vehicle (VIN scan + manual entry)
-
----
-
 ## Features
 
 <table>
