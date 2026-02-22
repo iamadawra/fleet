@@ -149,7 +149,7 @@ struct AddVehicleView: View {
                                 .font(.system(size: 17, weight: .semibold))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
-                                .frame(height: 56)
+                                .frame(height: FleetLayout.buttonHeight)
                                 .background(
                                     LinearGradient(
                                         colors: isFormValid

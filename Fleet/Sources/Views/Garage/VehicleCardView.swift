@@ -7,7 +7,7 @@ struct VehicleCardView: View {
         ZStack(alignment: .bottomLeading) {
             // Car image
             vehicleImage
-                .frame(height: vehicle.make == "Jeep" ? 180 : 210)
+                .frame(height: vehicle.make == "Jeep" ? FleetLayout.vehicleCardHeightCompact : FleetLayout.vehicleCardHeight)
                 .clipped()
 
             // Gradient overlay
@@ -65,7 +65,7 @@ struct VehicleCardView: View {
             .padding(.horizontal, 18)
             .padding(.bottom, 16)
         }
-        .frame(height: vehicle.make == "Jeep" && !vehicle.imageURL.isEmpty ? 180 : 210)
+        .frame(height: vehicle.make == "Jeep" && !vehicle.imageURL.isEmpty ? FleetLayout.vehicleCardHeightCompact : FleetLayout.vehicleCardHeight)
         .clipShape(RoundedRectangle(cornerRadius: FleetTheme.cardRadius))
         .shadow(color: .black.opacity(0.1), radius: 12, y: 4)
         .padding(.horizontal, 18)

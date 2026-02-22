@@ -21,7 +21,7 @@ struct ProfileView: View {
                                 } placeholder: {
                                     profilePlaceholder
                                 }
-                                .frame(width: 80, height: 80)
+                                .frame(width: FleetLayout.profilePhoto, height: FleetLayout.profilePhoto)
                                 .clipShape(Circle())
                             } else {
                                 profilePlaceholder
@@ -42,9 +42,9 @@ struct ProfileView: View {
                         // Stats row
                         HStack(spacing: 0) {
                             profileStat(value: "\(vehicles.count)", label: "Vehicles")
-                            Divider().frame(height: 30)
+                            Divider().frame(height: FleetLayout.statsDividerHeight)
                             profileStat(value: "\(GarageStatsHelper.alertCount(vehicles))", label: "Alerts")
-                            Divider().frame(height: 30)
+                            Divider().frame(height: FleetLayout.statsDividerHeight)
                             profileStat(value: GarageStatsHelper.formattedTotalFleetValue(vehicles), label: "Fleet Value")
                         }
                         .padding(.vertical, 16)
@@ -124,7 +124,7 @@ struct ProfileView: View {
                     endPoint: .bottomTrailing
                 )
             )
-            .frame(width: 80, height: 80)
+            .frame(width: FleetLayout.profilePhoto, height: FleetLayout.profilePhoto)
             .overlay(
                 Text(authService.currentUser?.firstName.prefix(1).uppercased() ?? "U")
                     .font(.system(size: 32, weight: .semibold))
@@ -150,7 +150,7 @@ struct ProfileView: View {
             Image(systemName: icon)
                 .font(.system(size: 18))
                 .foregroundColor(color)
-                .frame(width: 34, height: 34)
+                .frame(width: FleetLayout.iconMedium, height: FleetLayout.iconMedium)
                 .background(color.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 

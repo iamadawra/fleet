@@ -80,12 +80,12 @@ struct AlertsView: View {
             // Decorative circles
             Circle()
                 .fill(.white.opacity(0.08))
-                .frame(width: 160, height: 160)
+                .frame(width: FleetLayout.decorativeCircleLarge, height: FleetLayout.decorativeCircleLarge)
                 .offset(x: 80, y: -60)
 
             Circle()
                 .fill(.white.opacity(0.06))
-                .frame(width: 100, height: 100)
+                .frame(width: FleetLayout.decorativeCircleMedium, height: FleetLayout.decorativeCircleMedium)
                 .offset(x: -50, y: 60)
 
             VStack(alignment: .leading, spacing: 0) {
@@ -184,7 +184,7 @@ struct EventCardView: View {
                     .foregroundColor(FleetTheme.textSecondary)
                     .kerning(1)
             }
-            .frame(width: 48, height: 48)
+            .frame(width: FleetLayout.dateBlock, height: FleetLayout.dateBlock)
             .background(dateBlockColor)
             .clipShape(RoundedRectangle(cornerRadius: 14))
 

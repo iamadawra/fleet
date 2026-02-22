@@ -81,7 +81,7 @@ struct CarDetailView: View {
                 Button(action: { dismiss() }) {
                     Circle()
                         .fill(.white.opacity(0.85))
-                        .frame(width: 36, height: 36)
+                        .frame(width: FleetLayout.iconLarge, height: FleetLayout.iconLarge)
                         .overlay(
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 14, weight: .semibold))
@@ -100,7 +100,7 @@ struct CarDetailView: View {
                 } label: {
                     Circle()
                         .fill(.white.opacity(0.85))
-                        .frame(width: 36, height: 36)
+                        .frame(width: FleetLayout.iconLarge, height: FleetLayout.iconLarge)
                         .overlay(
                             Image(systemName: "ellipsis")
                                 .font(.system(size: 14, weight: .semibold))
@@ -135,7 +135,7 @@ struct CarDetailView: View {
     private var heroSection: some View {
         ZStack(alignment: .top) {
             vehicleImage
-                .frame(height: 260)
+                .frame(height: FleetLayout.heroImageHeight)
                 .clipped()
 
             LinearGradient(
@@ -148,7 +148,7 @@ struct CarDetailView: View {
                 endPoint: .bottom
             )
         }
-        .frame(height: 260)
+        .frame(height: FleetLayout.heroImageHeight)
     }
 
     @ViewBuilder
@@ -255,7 +255,7 @@ struct CarDetailView: View {
                     VStack(spacing: 0) {
                         Circle()
                             .fill(record.isCompleted ? FleetTheme.pastelMint : FleetTheme.pastelPeach)
-                            .frame(width: 32, height: 32)
+                            .frame(width: FleetLayout.iconStandard, height: FleetLayout.iconStandard)
                             .overlay(
                                 Image(systemName: record.isCompleted ? "checkmark" : "clock")
                                     .font(.system(size: 13, weight: .medium))
