@@ -150,12 +150,13 @@ class AuthenticationService: ObservableObject {
 
     // MARK: - Sign Out
 
-    func signOut() {
+    /// Throws if Firebase sign-out fails. Callers should catch and show a toast.
+    func signOut() throws {
         if googleSignInConfigured {
             GIDSignIn.sharedInstance.signOut()
         }
         if firebaseAvailable {
-            try? Auth.auth().signOut()
+            try Auth.auth().signOut()
         }
         currentUser = nil
         isSignedIn = false

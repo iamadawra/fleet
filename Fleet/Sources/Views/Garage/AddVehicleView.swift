@@ -5,6 +5,7 @@ struct AddVehicleView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var firestoreService: FirestoreService
+    @EnvironmentObject var toastManager: ToastManager
     @State private var make = ""
     @State private var model = ""
     @State private var year = ""
@@ -17,6 +18,8 @@ struct AddVehicleView: View {
     @State private var insuranceProvider = ""
     @State private var insuranceCoverage = "Full"
     @State private var insuranceExpiry = Calendar.current.date(byAdding: .year, value: 1, to: Date())!
+    @State private var validationErrors: [String] = []
+    @State private var isSaving = false
 
     private var isFormValid: Bool {
         !make.trimmingCharacters(in: .whitespaces).isEmpty &&
@@ -32,6 +35,26 @@ struct AddVehicleView: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
+                        // Validation errors banner
+                        if !validationErrors.isEmpty {
+                            VStack(alignment: .leading, spacing: 6) {
+                                ForEach(validationErrors, id: \.self) { error in
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "exclamationmark.circle.fill")
+                                            .font(.system(size: 13))
+                                            .foregroundColor(FleetTheme.accentRed)
+                                        Text(error)
+                                            .font(.system(size: 13))
+                                            .foregroundColor(Color(hex: "CC2B2B"))
+                                    }
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(14)
+                            .background(Color(hex: "FFD6D6").opacity(0.7))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+
                         // VIN Scan card
                         VStack(spacing: 12) {
                             Image(systemName: "barcode.viewfinder")
@@ -96,24 +119,30 @@ struct AddVehicleView: View {
 
                         // Add button
                         Button(action: saveVehicle) {
-                            Text("Add Vehicle")
-                                .font(.system(size: 17, weight: .semibold))
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 56)
-                                .background(
-                                    LinearGradient(
-                                        colors: isFormValid
-                                            ? [FleetTheme.accentPurple, FleetTheme.accentBlue]
-                                            : [Color.gray.opacity(0.4), Color.gray.opacity(0.3)],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
+                            HStack(spacing: 8) {
+                                if isSaving {
+                                    ProgressView()
+                                        .tint(.white)
+                                }
+                                Text(isSaving ? "Adding..." : "Add Vehicle")
+                                    .font(.system(size: 17, weight: .semibold))
+                                    .foregroundColor(.white)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(
+                                LinearGradient(
+                                    colors: isFormValid && !isSaving
+                                        ? [FleetTheme.accentPurple, FleetTheme.accentBlue]
+                                        : [Color.gray.opacity(0.4), Color.gray.opacity(0.3)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
                                 )
-                                .clipShape(RoundedRectangle(cornerRadius: 16))
-                                .shadow(color: isFormValid ? FleetTheme.accentPurple.opacity(0.35) : .clear, radius: 12, y: 6)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .shadow(color: isFormValid && !isSaving ? FleetTheme.accentPurple.opacity(0.35) : .clear, radius: 12, y: 6)
                         }
-                        .disabled(!isFormValid)
+                        .disabled(!isFormValid || isSaving)
                         .padding(.top, 8)
                     }
                     .padding(18)
@@ -130,7 +159,60 @@ struct AddVehicleView: View {
         }
     }
 
+    private func validateForm() -> [String] {
+        var errors: [String] = []
+
+        let trimmedMake = make.trimmingCharacters(in: .whitespaces)
+        let trimmedModel = model.trimmingCharacters(in: .whitespaces)
+        let trimmedYear = year.trimmingCharacters(in: .whitespaces)
+
+        if trimmedMake.isEmpty {
+            errors.append("Make is required.")
+        }
+        if trimmedModel.isEmpty {
+            errors.append("Model is required.")
+        }
+        if trimmedYear.isEmpty {
+            errors.append("Year is required.")
+        } else if let yearInt = Int(trimmedYear) {
+            if yearInt < 1886 || yearInt > Calendar.current.component(.year, from: Date()) + 2 {
+                errors.append("Year must be between 1886 and \(Calendar.current.component(.year, from: Date()) + 2).")
+            }
+        } else {
+            errors.append("Year must be a valid number.")
+        }
+
+        let cleanedMileage = mileage.replacingOccurrences(of: ",", with: "").trimmingCharacters(in: .whitespaces)
+        if !cleanedMileage.isEmpty {
+            if let mileageInt = Int(cleanedMileage) {
+                if mileageInt < 0 {
+                    errors.append("Mileage cannot be negative.")
+                }
+            } else {
+                errors.append("Mileage must be a valid number.")
+            }
+        }
+
+        let trimmedVin = vin.trimmingCharacters(in: .whitespaces)
+        if !trimmedVin.isEmpty && trimmedVin.count != 17 {
+            errors.append("VIN must be exactly 17 characters.")
+        }
+
+        return errors
+    }
+
     private func saveVehicle() {
+        let errors = validateForm()
+        withAnimation(.easeInOut(duration: 0.2)) {
+            validationErrors = errors
+        }
+        guard errors.isEmpty else {
+            toastManager.showWarning("Please fix the validation errors above.")
+            return
+        }
+
+        isSaving = true
+
         let vehicle = Vehicle(
             make: make.trimmingCharacters(in: .whitespaces),
             model: model.trimmingCharacters(in: .whitespaces),
@@ -151,8 +233,17 @@ struct AddVehicleView: View {
             )
         )
         modelContext.insert(vehicle)
-        firestoreService.uploadVehicle(vehicle)
-        dismiss()
+
+        Task {
+            do {
+                try await firestoreService.uploadVehicle(vehicle)
+                toastManager.showSuccess("\(vehicle.displayName) added to your garage.")
+            } catch {
+                toastManager.showWarning("Vehicle saved locally but cloud sync failed: \(error.localizedDescription)")
+            }
+            isSaving = false
+            dismiss()
+        }
     }
 }
 
