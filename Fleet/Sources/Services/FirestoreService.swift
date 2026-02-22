@@ -134,7 +134,7 @@ class FirestoreService: ObservableObject {
 
     // MARK: - Conversion Helpers
 
-    private func vehicleToDict(_ vehicle: Vehicle) -> [String: Any] {
+    func vehicleToDict(_ vehicle: Vehicle) -> [String: Any] {
         var dict: [String: Any] = [
             "make": vehicle.make,
             "model": vehicle.model,
@@ -197,7 +197,7 @@ class FirestoreService: ObservableObject {
         return dict
     }
 
-    private func dictToVehicle(_ data: [String: Any], docId: String) -> Vehicle? {
+    func dictToVehicle(_ data: [String: Any], docId: String) -> Vehicle? {
         guard let uuid = UUID(uuidString: docId),
               let make = data["make"] as? String,
               let model = data["model"] as? String,
