@@ -37,7 +37,7 @@ struct LoginView: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .frame(width: 120, height: 120)
+                        .frame(width: FleetLayout.appIconLarge, height: FleetLayout.appIconLarge)
                         .shadow(color: FleetTheme.accentPurple.opacity(0.4), radius: 20, y: 10)
 
                     Image(systemName: "car.fill")
@@ -78,7 +78,7 @@ struct LoginView: View {
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 56)
+                    .frame(height: FleetLayout.buttonHeight)
                     .background(
                         LinearGradient(
                             colors: [FleetTheme.accentPurple, FleetTheme.accentBlue],
@@ -129,7 +129,7 @@ struct FeatureRow: View {
             Image(systemName: icon)
                 .font(.system(size: 18))
                 .foregroundColor(FleetTheme.accentPurple)
-                .frame(width: 36, height: 36)
+                .frame(width: FleetLayout.iconLarge, height: FleetLayout.iconLarge)
                 .background(FleetTheme.pastelLavender)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
 

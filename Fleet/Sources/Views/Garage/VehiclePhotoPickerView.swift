@@ -82,7 +82,7 @@ struct VehiclePhotoPickerView: View {
     private var loadingView: some View {
         RoundedRectangle(cornerRadius: FleetTheme.cardRadius)
             .fill(.white.opacity(0.7))
-            .frame(height: 220)
+            .frame(height: FleetLayout.photoPickerHeight)
             .overlay {
                 VStack(spacing: 12) {
                     ProgressView()
@@ -100,7 +100,7 @@ struct VehiclePhotoPickerView: View {
     private var placeholderView: some View {
         RoundedRectangle(cornerRadius: FleetTheme.cardRadius)
             .fill(.white.opacity(0.7))
-            .frame(height: 220)
+            .frame(height: FleetLayout.photoPickerHeight)
             .overlay {
                 VStack(spacing: 12) {
                     Image(systemName: "car.fill")
@@ -128,14 +128,14 @@ struct VehiclePhotoPickerView: View {
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(height: 220)
+                        .frame(height: FleetLayout.photoPickerHeight)
                         .clipped()
                 case .failure:
                     fallbackImageView
                 default:
                     RoundedRectangle(cornerRadius: FleetTheme.cardRadius)
                         .fill(FleetTheme.pastelBlue)
-                        .frame(height: 220)
+                        .frame(height: FleetLayout.photoPickerHeight)
                         .overlay { ProgressView() }
                 }
             }
@@ -174,7 +174,7 @@ struct VehiclePhotoPickerView: View {
                                     .fill(FleetTheme.pastelBlue)
                             }
                         }
-                        .frame(width: 100, height: 70)
+                        .frame(width: FleetLayout.thumbnailWidth, height: FleetLayout.thumbnailHeight)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
@@ -203,7 +203,7 @@ struct VehiclePhotoPickerView: View {
     private var fallbackImageView: some View {
         RoundedRectangle(cornerRadius: FleetTheme.cardRadius)
             .fill(FleetTheme.pastelLavender)
-            .frame(height: 220)
+            .frame(height: FleetLayout.photoPickerHeight)
             .overlay {
                 Image(systemName: "car.fill")
                     .font(.system(size: 48))
@@ -225,7 +225,7 @@ struct VehiclePhotoPickerView: View {
                     .foregroundColor(.white)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 56)
+            .frame(height: FleetLayout.buttonHeight)
             .background(
                 LinearGradient(
                     colors: isSaving

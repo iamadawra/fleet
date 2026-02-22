@@ -39,7 +39,7 @@ struct StatusCardView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(iconBgColor)
-                    .frame(width: 34, height: 34)
+                    .frame(width: FleetLayout.iconMedium, height: FleetLayout.iconMedium)
                 Image(systemName: icon)
                     .font(.system(size: 16))
                     .foregroundColor(iconColor)
@@ -60,7 +60,7 @@ struct StatusCardView: View {
                     Text("!")
                         .font(.system(size: 11, weight: .bold))
                         .foregroundColor(.white)
-                        .frame(width: 20, height: 20)
+                        .frame(width: FleetLayout.statusBadge, height: FleetLayout.statusBadge)
                         .background(FleetTheme.accentRed)
                         .clipShape(Circle())
                         .padding(.leading, 6)
@@ -88,7 +88,7 @@ struct StatusCardView: View {
                 bgColor
                 Circle()
                     .fill(accentColor.opacity(0.3))
-                    .frame(width: 70, height: 70)
+                    .frame(width: FleetLayout.decorativeCircleSmall, height: FleetLayout.decorativeCircleSmall)
                     .offset(x: 20, y: -20)
             }
         )

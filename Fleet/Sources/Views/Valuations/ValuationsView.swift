@@ -79,7 +79,7 @@ struct ValuationCardView: View {
             // Image section
             ZStack(alignment: .bottom) {
                 vehicleImage
-                    .frame(height: 160)
+                    .frame(height: FleetLayout.valuationImageHeight)
                     .clipped()
 
                 LinearGradient(
@@ -88,7 +88,7 @@ struct ValuationCardView: View {
                     endPoint: .bottom
                 )
             }
-            .frame(height: 160)
+            .frame(height: FleetLayout.valuationImageHeight)
 
             // Body
             VStack(alignment: .leading, spacing: 0) {
@@ -148,7 +148,7 @@ struct ValuationCardView: View {
                     // Background
                     RoundedRectangle(cornerRadius: 8)
                         .fill(Color.black.opacity(0.06))
-                        .frame(height: 8)
+                        .frame(height: FleetLayout.rangeBarHeight)
 
                     // Fill
                     GeometryReader { geo in
@@ -168,14 +168,14 @@ struct ValuationCardView: View {
                     // Thumb
                     Circle()
                         .fill(.white)
-                        .frame(width: 18, height: 18)
+                        .frame(width: FleetLayout.rangeThumbSize, height: FleetLayout.rangeThumbSize)
                         .overlay(
                             Circle()
                                 .strokeBorder(isUp ? FleetTheme.accentPurple : FleetTheme.accentBlue, lineWidth: 3)
                         )
                         .shadow(color: FleetTheme.accentPurple.opacity(0.4), radius: 4, y: 2)
                 }
-                .frame(height: 18)
+                .frame(height: FleetLayout.rangeThumbSize)
                 .padding(.vertical, 6)
 
                 // Trend indicator

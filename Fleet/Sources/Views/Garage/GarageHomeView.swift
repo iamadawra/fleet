@@ -80,7 +80,7 @@ struct GarageHomeView: View {
                                 ZStack {
                                     Circle()
                                         .fill(FleetTheme.accentPurple.opacity(0.12))
-                                        .frame(width: 30, height: 30)
+                                        .frame(width: FleetLayout.iconSmall, height: FleetLayout.iconSmall)
                                     Image(systemName: "plus")
                                         .font(.system(size: 14, weight: .semibold))
                                         .foregroundColor(FleetTheme.accentPurple)
@@ -90,7 +90,7 @@ struct GarageHomeView: View {
                                     .foregroundColor(FleetTheme.accentPurple)
                             }
                             .frame(maxWidth: .infinity)
-                            .frame(height: 80)
+                            .frame(height: FleetLayout.tallButtonHeight)
                             .background(FleetTheme.accentPurple.opacity(0.04))
                             .clipShape(RoundedRectangle(cornerRadius: FleetTheme.cardRadius))
                             .overlay(

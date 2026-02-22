@@ -70,7 +70,7 @@ struct NotificationsSettingsView: View {
             Image(systemName: icon)
                 .font(.system(size: 16))
                 .foregroundColor(iconColor)
-                .frame(width: 34, height: 34)
+                .frame(width: FleetLayout.iconMedium, height: FleetLayout.iconMedium)
                 .background(iconColor.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
@@ -150,7 +150,7 @@ struct DefaultVehicleSettingsView: View {
             Image(systemName: "car.fill")
                 .font(.system(size: 16))
                 .foregroundColor(FleetTheme.accentBlue)
-                .frame(width: 34, height: 34)
+                .frame(width: FleetLayout.iconMedium, height: FleetLayout.iconMedium)
                 .background(FleetTheme.accentBlue.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
@@ -167,13 +167,13 @@ struct DefaultVehicleSettingsView: View {
 
             if isSelected {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 22))
+                    .font(.system(size: FleetLayout.radioButton))
                     .foregroundColor(FleetTheme.accentPurple)
                     .transition(.scale.combined(with: .opacity))
             } else {
                 Circle()
                     .strokeBorder(FleetTheme.textTertiary, lineWidth: 1.5)
-                    .frame(width: 22, height: 22)
+                    .frame(width: FleetLayout.radioButton, height: FleetLayout.radioButton)
             }
         }
         .padding(.horizontal, 16)
@@ -237,7 +237,7 @@ struct ValuationPreferencesView: View {
                                     Image(systemName: "calendar.badge.clock")
                                         .font(.system(size: 16))
                                         .foregroundColor(FleetTheme.accentBlue)
-                                        .frame(width: 34, height: 34)
+                                        .frame(width: FleetLayout.iconMedium, height: FleetLayout.iconMedium)
                                         .background(FleetTheme.accentBlue.opacity(0.12))
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
 
@@ -287,7 +287,7 @@ struct ValuationPreferencesView: View {
             Image(systemName: icon)
                 .font(.system(size: 16))
                 .foregroundColor(iconColor)
-                .frame(width: 34, height: 34)
+                .frame(width: FleetLayout.iconMedium, height: FleetLayout.iconMedium)
                 .background(iconColor.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
@@ -379,7 +379,7 @@ struct PrivacySecuritySettingsView: View {
             Image(systemName: icon)
                 .font(.system(size: 16))
                 .foregroundColor(iconColor)
-                .frame(width: 34, height: 34)
+                .frame(width: FleetLayout.iconMedium, height: FleetLayout.iconMedium)
                 .background(iconColor.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
@@ -524,7 +524,7 @@ struct HelpSupportView: View {
             Image(systemName: icon)
                 .font(.system(size: 16))
                 .foregroundColor(iconColor)
-                .frame(width: 34, height: 34)
+                .frame(width: FleetLayout.iconMedium, height: FleetLayout.iconMedium)
                 .background(iconColor.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
@@ -567,7 +567,7 @@ struct AboutFleetView: View {
                                         endPoint: .bottomTrailing
                                     )
                                 )
-                                .frame(width: 80, height: 80)
+                                .frame(width: FleetLayout.appIconMedium, height: FleetLayout.appIconMedium)
                                 .shadow(color: FleetTheme.accentPurple.opacity(0.3), radius: 12, y: 4)
 
                             Image(systemName: "car.fill")
@@ -675,7 +675,7 @@ struct AboutFleetView: View {
             Image(systemName: icon)
                 .font(.system(size: 16))
                 .foregroundColor(FleetTheme.accentPurple)
-                .frame(width: 34, height: 34)
+                .frame(width: FleetLayout.iconMedium, height: FleetLayout.iconMedium)
                 .background(FleetTheme.accentPurple.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
