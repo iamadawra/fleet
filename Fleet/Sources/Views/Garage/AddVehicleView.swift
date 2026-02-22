@@ -19,7 +19,7 @@ struct AddVehicleView: View {
     @State private var insuranceCoverage = "Full"
     @State private var insuranceExpiry = Calendar.current.date(byAdding: .year, value: 1, to: Date())!
     @State private var validationErrors: [String] = []
-    @State private var isSaving = false
+    @State private var showPhotoPicker = false
 
     /// Models available for the currently-selected make.
     private var availableModels: [String] {
@@ -143,32 +143,26 @@ struct AddVehicleView: View {
                         .clipShape(RoundedRectangle(cornerRadius: FleetTheme.cardRadius))
                         .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
 
-                        // Add button
-                        Button(action: saveVehicle) {
-                            HStack(spacing: 8) {
-                                if isSaving {
-                                    ProgressView()
-                                        .tint(.white)
-                                }
-                                Text(isSaving ? "Adding..." : "Add Vehicle")
-                                    .font(.system(size: 17, weight: .semibold))
-                                    .foregroundColor(.white)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(
-                                LinearGradient(
-                                    colors: isFormValid && !isSaving
-                                        ? [FleetTheme.accentPurple, FleetTheme.accentBlue]
-                                        : [Color.gray.opacity(0.4), Color.gray.opacity(0.3)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
+                        // Next step button
+                        Button(action: proceedToPhotoPicker) {
+                            Text("Next: Choose Photo")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 56)
+                                .background(
+                                    LinearGradient(
+                                        colors: isFormValid
+                                            ? [FleetTheme.accentPurple, FleetTheme.accentBlue]
+                                            : [Color.gray.opacity(0.4), Color.gray.opacity(0.3)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
                                 )
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                            .shadow(color: isFormValid && !isSaving ? FleetTheme.accentPurple.opacity(0.35) : .clear, radius: 12, y: 6)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                .shadow(color: isFormValid ? FleetTheme.accentPurple.opacity(0.35) : .clear, radius: 12, y: 6)
                         }
-                        .disabled(!isFormValid || isSaving)
+                        .disabled(!isFormValid)
                         .padding(.top, 8)
                     }
                     .padding(18)
@@ -181,6 +175,23 @@ struct AddVehicleView: View {
                     Button("Cancel") { dismiss() }
                         .foregroundColor(FleetTheme.accentPurple)
                 }
+            }
+            .navigationDestination(isPresented: $showPhotoPicker) {
+                VehiclePhotoPickerView(
+                    make: make,
+                    model: model,
+                    year: year,
+                    trim: trim.trimmingCharacters(in: .whitespaces),
+                    color: color.trimmingCharacters(in: .whitespaces),
+                    mileage: Int(mileage.replacingOccurrences(of: ",", with: "")) ?? 0,
+                    vin: vin.trimmingCharacters(in: .whitespaces),
+                    registrationExpiry: registrationExpiry,
+                    registrationState: registrationState.trimmingCharacters(in: .whitespaces),
+                    insuranceProvider: insuranceProvider.trimmingCharacters(in: .whitespaces),
+                    insuranceCoverage: insuranceCoverage.trimmingCharacters(in: .whitespaces),
+                    insuranceExpiry: insuranceExpiry,
+                    dismissFlow: { dismiss() }
+                )
             }
         }
     }
@@ -219,7 +230,7 @@ struct AddVehicleView: View {
         return errors
     }
 
-    private func saveVehicle() {
+    private func proceedToPhotoPicker() {
         let errors = validateForm()
         withAnimation(.easeInOut(duration: 0.2)) {
             validationErrors = errors
@@ -228,40 +239,7 @@ struct AddVehicleView: View {
             toastManager.showWarning("Please fix the validation errors above.")
             return
         }
-
-        isSaving = true
-
-        let vehicle = Vehicle(
-            make: make,
-            model: model,
-            year: year,
-            trim: trim.trimmingCharacters(in: .whitespaces),
-            color: color.trimmingCharacters(in: .whitespaces),
-            mileage: Int(mileage.replacingOccurrences(of: ",", with: "")) ?? 0,
-            vin: vin.trimmingCharacters(in: .whitespaces),
-            imageURL: "",
-            registration: RegistrationInfo(
-                expiryDate: registrationExpiry,
-                state: registrationState.trimmingCharacters(in: .whitespaces)
-            ),
-            insurance: InsuranceInfo(
-                provider: insuranceProvider.trimmingCharacters(in: .whitespaces),
-                coverageType: insuranceCoverage.trimmingCharacters(in: .whitespaces),
-                expiryDate: insuranceExpiry
-            )
-        )
-        modelContext.insert(vehicle)
-
-        Task {
-            do {
-                try await firestoreService.uploadVehicle(vehicle)
-                toastManager.showSuccess("\(vehicle.displayName) added to your garage.")
-            } catch {
-                toastManager.showWarning("Vehicle saved locally but cloud sync failed: \(error.localizedDescription)")
-            }
-            isSaving = false
-            dismiss()
-        }
+        showPhotoPicker = true
     }
 }
 
