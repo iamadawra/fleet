@@ -29,6 +29,8 @@ targets:
         product: GoogleSignInSwift
       - package: FirebaseSDK
         product: FirebaseAuth
+      - package: FirebaseSDK
+        product: FirebaseFirestore
     settings:
       base:
         SWIFT_VERSION: "5.9"

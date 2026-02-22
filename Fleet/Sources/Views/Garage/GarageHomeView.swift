@@ -4,6 +4,7 @@ import SwiftData
 struct GarageHomeView: View {
     @Query private var vehicles: [Vehicle]
     @EnvironmentObject var authService: AuthenticationService
+    @EnvironmentObject var firestoreService: FirestoreService
     @Environment(\.modelContext) private var modelContext
     @State private var selectedVehicle: Vehicle?
     @State private var showAddVehicle = false
@@ -113,6 +114,7 @@ struct GarageHomeView: View {
                 }
                 Button("Delete", role: .destructive) {
                     if let vehicle = vehicleToDelete {
+                        firestoreService.deleteVehicle(vehicle)
                         modelContext.delete(vehicle)
                     }
                     vehicleToDelete = nil

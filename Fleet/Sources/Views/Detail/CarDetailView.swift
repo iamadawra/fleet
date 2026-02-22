@@ -5,6 +5,7 @@ struct CarDetailView: View {
     let vehicle: Vehicle
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var firestoreService: FirestoreService
     @State private var showDeleteConfirmation = false
 
     var body: some View {
@@ -111,6 +112,7 @@ struct CarDetailView: View {
         .alert("Delete Vehicle", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Delete", role: .destructive) {
+                firestoreService.deleteVehicle(vehicle)
                 modelContext.delete(vehicle)
                 dismiss()
             }
