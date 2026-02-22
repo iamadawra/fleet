@@ -190,7 +190,6 @@ struct AddVehicleView: View {
 
         let trimmedMake = make.trimmingCharacters(in: .whitespaces)
         let trimmedModel = model.trimmingCharacters(in: .whitespaces)
-        let trimmedYear = year.trimmingCharacters(in: .whitespaces)
 
         if trimmedMake.isEmpty {
             errors.append("Make is required.")
@@ -198,14 +197,8 @@ struct AddVehicleView: View {
         if trimmedModel.isEmpty {
             errors.append("Model is required.")
         }
-        if trimmedYear.isEmpty {
-            errors.append("Year is required.")
-        } else if let yearInt = Int(trimmedYear) {
-            if yearInt < 1886 || yearInt > Calendar.current.component(.year, from: Date()) + 2 {
-                errors.append("Year must be between 1886 and \(Calendar.current.component(.year, from: Date()) + 2).")
-            }
-        } else {
-            errors.append("Year must be a valid number.")
+        if year < 1886 || year > Calendar.current.component(.year, from: Date()) + 2 {
+            errors.append("Year must be between 1886 and \(Calendar.current.component(.year, from: Date()) + 2).")
         }
 
         let cleanedMileage = mileage.replacingOccurrences(of: ",", with: "").trimmingCharacters(in: .whitespaces)
