@@ -17,13 +17,43 @@
 
 <br />
 
+<p align="center">
+  <img src="assets/fleet-all-screens.png" width="800" alt="Fleet App Screenshots" />
+</p>
+
+<br />
+
 Fleet is an iOS app for car owners who want a single, beautiful place to manage everything about their vehicles — registrations, insurance, NHTSA recalls, service history, and live KBB valuations.
 
 Built with SwiftUI and designed around a soft pastel aesthetic with glass-morphism cards and fluid gradients.
 
 ---
 
+## Screens
+
+<p align="center">
+  <img src="assets/01-garage-home.png" width="220" alt="Garage Home" />
+  &nbsp;&nbsp;
+  <img src="assets/02-car-detail.png" width="220" alt="Car Detail" />
+  &nbsp;&nbsp;
+  <img src="assets/03-alerts-timeline.png" width="220" alt="Alerts & Timeline" />
+  &nbsp;&nbsp;
+  <img src="assets/04-kbb-valuations.png" width="220" alt="KBB Valuations" />
+</p>
+
+<p align="center">
+  <sub>Garage Home&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Car Detail&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alerts & Timeline&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KBB Valuations</sub>
+</p>
+
+**Additional screens:** Login (Google Sign-In + demo mode) · Profile & Settings · Add Vehicle (VIN scan + manual entry)
+
+---
+
 ## Features
+
+<p align="center">
+  <img src="assets/fleet-features.png" width="800" alt="Fleet Features" />
+</p>
 
 <table>
   <tr>
@@ -51,16 +81,6 @@ Built with SwiftUI and designed around a soft pastel aesthetic with glass-morphi
     <td><strong>Google Sign-In</strong><br/>Secure authentication — no passwords to remember.</td>
   </tr>
 </table>
-
----
-
-## Screens
-
-| Garage Home | Car Detail | Alerts & Timeline | KBB Valuations |
-|:-----------:|:----------:|:-----------------:|:--------------:|
-| Vehicle cards with status badges, alert chips, and quick-glance stats | Registration, insurance, recalls, and full service history timeline | Fleet health score with upcoming deadlines across all vehicles | Per-vehicle trade-in, private sale, and dealer range with trend data |
-
-**Additional screens:** Login (Google Sign-In + demo mode), Profile & Settings, Add Vehicle (VIN scan + manual entry)
 
 ---
 
