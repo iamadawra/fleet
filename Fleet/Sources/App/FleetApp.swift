@@ -4,11 +4,16 @@ import GoogleSignIn
 import FirebaseCore
 
 class AppDelegate: NSObject, UIApplicationDelegate {
+    static var isFirebaseConfigured = false
+
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        FirebaseApp.configure()
+        if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
+            FirebaseApp.configure()
+            AppDelegate.isFirebaseConfigured = true
+        }
         return true
     }
 }

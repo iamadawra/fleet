@@ -3,7 +3,7 @@ import Foundation
 struct Recall: Identifiable, Codable {
     let id: UUID
     var title: String
-    var description: String
+    var details: String
     var source: String
     var dateIssued: Date
     var isResolved: Bool

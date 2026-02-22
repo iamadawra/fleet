@@ -4,13 +4,14 @@ import SwiftData
 
 @MainActor
 class FirestoreService: ObservableObject {
-    private let db = Firestore.firestore()
+    private var db: Firestore? { AppDelegate.isFirebaseConfigured ? Firestore.firestore() : nil }
     private var listener: ListenerRegistration?
     private var userId: String?
 
     // MARK: - Listener Management
 
     func startListening(userId: String, modelContext: ModelContext) {
+        guard let db else { return }
         stopListening()
         self.userId = userId
 
@@ -32,7 +33,7 @@ class FirestoreService: ObservableObject {
     // MARK: - CRUD Operations
 
     func uploadVehicle(_ vehicle: Vehicle) {
-        guard let userId else { return }
+        guard let db, let userId else { return }
         let data = vehicleToDict(vehicle)
         db.collection("users").document(userId).collection("vehicles")
             .document(vehicle.id.uuidString)
@@ -44,7 +45,7 @@ class FirestoreService: ObservableObject {
     }
 
     func deleteVehicle(_ vehicle: Vehicle) {
-        guard let userId else { return }
+        guard let db, let userId else { return }
         db.collection("users").document(userId).collection("vehicles")
             .document(vehicle.id.uuidString)
             .delete { error in
@@ -130,7 +131,7 @@ class FirestoreService: ObservableObject {
                 [
                     "id": recall.id.uuidString,
                     "title": recall.title,
-                    "description": recall.description,
+                    "description": recall.details,
                     "source": recall.source,
                     "dateIssued": Timestamp(date: recall.dateIssued),
                     "isResolved": recall.isResolved
@@ -161,7 +162,7 @@ class FirestoreService: ObservableObject {
                 "trend": [
                     "amount": val.trend.amount,
                     "direction": val.trend.direction.rawValue,
-                    "description": val.trend.description
+                    "description": val.trend.summary
                 ],
                 "lastUpdated": Timestamp(date: val.lastUpdated)
             ] as [String: Any]
@@ -205,7 +206,7 @@ class FirestoreService: ObservableObject {
             return Recall(
                 id: id,
                 title: title,
-                description: r["description"] as? String ?? "",
+                details: r["description"] as? String ?? "",
                 source: r["source"] as? String ?? "",
                 dateIssued: (r["dateIssued"] as? Timestamp)?.dateValue() ?? Date(),
                 isResolved: r["isResolved"] as? Bool ?? false
@@ -242,7 +243,7 @@ class FirestoreService: ObservableObject {
                 tradeIn: tradeIn,
                 privateSale: privateSale,
                 dealer: dealer,
-                trend: ValuationTrend(amount: trendAmount, direction: trendDir, description: trendDesc),
+                trend: ValuationTrend(amount: trendAmount, direction: trendDir, summary: trendDesc),
                 lastUpdated: lastUpdated
             )
         }

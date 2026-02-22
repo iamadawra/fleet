@@ -56,7 +56,7 @@ enum FleetTheme {
     static let cardRadius: CGFloat = 22
     static let pillRadius: CGFloat = 100
 
-    static let cardShadow: some ShapeStyle {
+    static var cardShadow: some ShapeStyle {
         Color.black.opacity(0.1)
     }
 }
