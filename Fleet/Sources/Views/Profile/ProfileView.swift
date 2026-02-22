@@ -3,6 +3,7 @@ import SwiftData
 
 struct ProfileView: View {
     @EnvironmentObject var authService: AuthenticationService
+    @EnvironmentObject var toastManager: ToastManager
     @Query private var vehicles: [Vehicle]
 
     var body: some View {
@@ -86,7 +87,13 @@ struct ProfileView: View {
                         .padding(.horizontal, 18)
 
                         // Sign out button
-                        Button(action: { authService.signOut() }) {
+                        Button(action: {
+                            do {
+                                try authService.signOut()
+                            } catch {
+                                toastManager.showError("Failed to sign out: \(error.localizedDescription)")
+                            }
+                        }) {
                             Text("Sign Out")
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(FleetTheme.accentRed)

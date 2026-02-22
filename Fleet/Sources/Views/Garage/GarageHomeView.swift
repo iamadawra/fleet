@@ -5,6 +5,7 @@ struct GarageHomeView: View {
     @Query private var vehicles: [Vehicle]
     @EnvironmentObject var authService: AuthenticationService
     @EnvironmentObject var firestoreService: FirestoreService
+    @EnvironmentObject var toastManager: ToastManager
     @Environment(\.modelContext) private var modelContext
     @State private var selectedVehicle: Vehicle?
     @State private var showAddVehicle = false
@@ -114,8 +115,16 @@ struct GarageHomeView: View {
                 }
                 Button("Delete", role: .destructive) {
                     if let vehicle = vehicleToDelete {
-                        firestoreService.deleteVehicle(vehicle)
+                        let vehicleName = vehicle.displayName
+                        Task {
+                            do {
+                                try await firestoreService.deleteVehicle(vehicle)
+                            } catch {
+                                toastManager.showError("Failed to delete \(vehicleName) from cloud: \(error.localizedDescription)")
+                            }
+                        }
                         modelContext.delete(vehicle)
+                        toastManager.showSuccess("\(vehicleName) removed from your garage.")
                     }
                     vehicleToDelete = nil
                 }

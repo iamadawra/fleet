@@ -6,6 +6,7 @@ struct CarDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var firestoreService: FirestoreService
+    @EnvironmentObject var toastManager: ToastManager
     @State private var showDeleteConfirmation = false
 
     var body: some View {
@@ -112,8 +113,16 @@ struct CarDetailView: View {
         .alert("Delete Vehicle", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Delete", role: .destructive) {
-                firestoreService.deleteVehicle(vehicle)
+                let vehicleName = vehicle.displayName
+                Task {
+                    do {
+                        try await firestoreService.deleteVehicle(vehicle)
+                    } catch {
+                        toastManager.showError("Failed to delete \(vehicleName) from cloud: \(error.localizedDescription)")
+                    }
+                }
                 modelContext.delete(vehicle)
+                toastManager.showSuccess("\(vehicleName) removed from your garage.")
                 dismiss()
             }
         } message: {

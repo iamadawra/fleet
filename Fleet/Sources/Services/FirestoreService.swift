@@ -8,6 +8,9 @@ class FirestoreService: ObservableObject {
     private var listener: ListenerRegistration?
     private var userId: String?
 
+    /// Published error from snapshot listener for views to observe
+    @Published var listenerError: String?
+
     // MARK: - Listener Management
 
     func startListening(userId: String, modelContext: ModelContext) {
@@ -17,8 +20,17 @@ class FirestoreService: ObservableObject {
 
         listener = db.collection("users").document(userId).collection("vehicles")
             .addSnapshotListener { [weak self] snapshot, error in
-                guard let self, let snapshot else { return }
+                guard let self else { return }
                 Task { @MainActor in
+                    if let error {
+                        self.listenerError = "Sync error: \(error.localizedDescription)"
+                        return
+                    }
+                    guard let snapshot else {
+                        self.listenerError = "Failed to receive data from server."
+                        return
+                    }
+                    self.listenerError = nil
                     self.handleSnapshot(snapshot, modelContext: modelContext)
                 }
             }
@@ -28,39 +40,40 @@ class FirestoreService: ObservableObject {
         listener?.remove()
         listener = nil
         userId = nil
+        listenerError = nil
     }
 
     // MARK: - CRUD Operations
 
-    func uploadVehicle(_ vehicle: Vehicle) {
+    func uploadVehicle(_ vehicle: Vehicle) async throws {
         guard let db, let userId else { return }
         let data = vehicleToDict(vehicle)
-        db.collection("users").document(userId).collection("vehicles")
+        try await db.collection("users").document(userId).collection("vehicles")
             .document(vehicle.id.uuidString)
-            .setData(data) { error in
-                if let error {
-                    print("Firestore upload error: \(error.localizedDescription)")
-                }
-            }
+            .setData(data)
     }
 
-    func deleteVehicle(_ vehicle: Vehicle) {
+    func deleteVehicle(_ vehicle: Vehicle) async throws {
         guard let db, let userId else { return }
-        db.collection("users").document(userId).collection("vehicles")
+        try await db.collection("users").document(userId).collection("vehicles")
             .document(vehicle.id.uuidString)
-            .delete { error in
-                if let error {
-                    print("Firestore delete error: \(error.localizedDescription)")
-                }
-            }
+            .delete()
     }
 
-    func syncAllLocalVehicles(modelContext: ModelContext) {
+    func syncAllLocalVehicles(modelContext: ModelContext) async throws {
         guard userId != nil else { return }
         let descriptor = FetchDescriptor<Vehicle>()
-        guard let vehicles = try? modelContext.fetch(descriptor) else { return }
+        let vehicles = try modelContext.fetch(descriptor)
+        var errors: [String] = []
         for vehicle in vehicles {
-            uploadVehicle(vehicle)
+            do {
+                try await uploadVehicle(vehicle)
+            } catch {
+                errors.append("\(vehicle.displayName): \(error.localizedDescription)")
+            }
+        }
+        if !errors.isEmpty {
+            throw FirestoreSyncError.partialSyncFailure(details: errors.joined(separator: "; "))
         }
     }
 
@@ -73,34 +86,47 @@ class FirestoreService: ObservableObject {
 
             switch change.type {
             case .added, .modified:
-                guard let vehicle = dictToVehicle(data, docId: docId) else { continue }
+                guard let vehicle = dictToVehicle(data, docId: docId) else {
+                    print("[Fleet] Warning: Failed to parse vehicle from Firestore document \(docId). Skipping.")
+                    continue
+                }
                 // Check if vehicle already exists locally
                 let targetId = vehicle.id
                 let descriptor = FetchDescriptor<Vehicle>(predicate: #Predicate { $0.id == targetId })
-                if let existing = try? modelContext.fetch(descriptor).first {
-                    // Update existing
-                    existing.make = vehicle.make
-                    existing.model = vehicle.model
-                    existing.year = vehicle.year
-                    existing.trim = vehicle.trim
-                    existing.color = vehicle.color
-                    existing.mileage = vehicle.mileage
-                    existing.vin = vehicle.vin
-                    existing.imageURL = vehicle.imageURL
-                    existing.registration = vehicle.registration
-                    existing.insurance = vehicle.insurance
-                    existing.recalls = vehicle.recalls
-                    existing.maintenanceRecords = vehicle.maintenanceRecords
-                    existing.valuation = vehicle.valuation
-                } else {
-                    modelContext.insert(vehicle)
+                do {
+                    if let existing = try modelContext.fetch(descriptor).first {
+                        existing.make = vehicle.make
+                        existing.model = vehicle.model
+                        existing.year = vehicle.year
+                        existing.trim = vehicle.trim
+                        existing.color = vehicle.color
+                        existing.mileage = vehicle.mileage
+                        existing.vin = vehicle.vin
+                        existing.imageURL = vehicle.imageURL
+                        existing.registration = vehicle.registration
+                        existing.insurance = vehicle.insurance
+                        existing.recalls = vehicle.recalls
+                        existing.maintenanceRecords = vehicle.maintenanceRecords
+                        existing.valuation = vehicle.valuation
+                    } else {
+                        modelContext.insert(vehicle)
+                    }
+                } catch {
+                    print("[Fleet] Warning: SwiftData fetch failed for vehicle \(docId): \(error.localizedDescription)")
                 }
 
             case .removed:
-                guard let uuid = UUID(uuidString: docId) else { continue }
+                guard let uuid = UUID(uuidString: docId) else {
+                    print("[Fleet] Warning: Invalid UUID in Firestore document ID: \(docId)")
+                    continue
+                }
                 let descriptor = FetchDescriptor<Vehicle>(predicate: #Predicate { $0.id == uuid })
-                if let existing = try? modelContext.fetch(descriptor).first {
-                    modelContext.delete(existing)
+                do {
+                    if let existing = try modelContext.fetch(descriptor).first {
+                        modelContext.delete(existing)
+                    }
+                } catch {
+                    print("[Fleet] Warning: SwiftData fetch failed during delete for \(docId): \(error.localizedDescription)")
                 }
             }
         }
@@ -264,5 +290,18 @@ class FirestoreService: ObservableObject {
             maintenanceRecords: maintenanceRecords,
             valuation: valuation
         )
+    }
+}
+
+// MARK: - Error Types
+
+enum FirestoreSyncError: LocalizedError {
+    case partialSyncFailure(details: String)
+
+    var errorDescription: String? {
+        switch self {
+        case .partialSyncFailure(let details):
+            return "Some vehicles failed to sync: \(details)"
+        }
     }
 }
