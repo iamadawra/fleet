@@ -54,10 +54,18 @@ struct ProfileView: View {
 
                         // Settings sections
                         VStack(spacing: 2) {
-                            settingsRow(icon: "bell.fill", color: FleetTheme.accentPurple, title: "Notifications")
-                            settingsRow(icon: "car.fill", color: FleetTheme.accentBlue, title: "Default Vehicle")
-                            settingsRow(icon: "dollarsign.circle.fill", color: FleetTheme.accentGreen, title: "Valuation Preferences")
-                            settingsRow(icon: "lock.fill", color: FleetTheme.accentOrange, title: "Privacy & Security")
+                            NavigationLink(destination: NotificationsSettingsView()) {
+                                settingsRow(icon: "bell.fill", color: FleetTheme.accentPurple, title: "Notifications")
+                            }
+                            NavigationLink(destination: DefaultVehicleSettingsView()) {
+                                settingsRow(icon: "car.fill", color: FleetTheme.accentBlue, title: "Default Vehicle")
+                            }
+                            NavigationLink(destination: ValuationPreferencesView()) {
+                                settingsRow(icon: "dollarsign.circle.fill", color: FleetTheme.accentGreen, title: "Valuation Preferences")
+                            }
+                            NavigationLink(destination: PrivacySecuritySettingsView()) {
+                                settingsRow(icon: "lock.fill", color: FleetTheme.accentOrange, title: "Privacy & Security")
+                            }
                         }
                         .background(.white.opacity(0.7))
                         .clipShape(RoundedRectangle(cornerRadius: 18))
@@ -65,8 +73,12 @@ struct ProfileView: View {
                         .padding(.horizontal, 18)
 
                         VStack(spacing: 2) {
-                            settingsRow(icon: "questionmark.circle.fill", color: FleetTheme.textSecondary, title: "Help & Support")
-                            settingsRow(icon: "info.circle.fill", color: FleetTheme.textSecondary, title: "About Fleet")
+                            NavigationLink(destination: HelpSupportView()) {
+                                settingsRow(icon: "questionmark.circle.fill", color: FleetTheme.textSecondary, title: "Help & Support")
+                            }
+                            NavigationLink(destination: AboutFleetView()) {
+                                settingsRow(icon: "info.circle.fill", color: FleetTheme.textSecondary, title: "About Fleet")
+                            }
                         }
                         .background(.white.opacity(0.7))
                         .clipShape(RoundedRectangle(cornerRadius: 18))
