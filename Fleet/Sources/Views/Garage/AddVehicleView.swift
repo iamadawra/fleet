@@ -8,7 +8,7 @@ struct AddVehicleView: View {
     @EnvironmentObject var toastManager: ToastManager
     @State private var make = ""
     @State private var model = ""
-    @State private var year = ""
+    @State private var year: Int = VehicleCatalog.years.first ?? 2025
     @State private var trim = ""
     @State private var color = ""
     @State private var vin = ""
@@ -21,11 +21,13 @@ struct AddVehicleView: View {
     @State private var validationErrors: [String] = []
     @State private var isSaving = false
 
+    /// Models available for the currently-selected make.
+    private var availableModels: [String] {
+        VehicleCatalog.models(for: make)
+    }
+
     private var isFormValid: Bool {
-        !make.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !model.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !year.trimmingCharacters(in: .whitespaces).isEmpty &&
-        Int(year) != nil
+        !make.isEmpty && !model.isEmpty
     }
 
     var body: some View {
@@ -86,12 +88,36 @@ struct AddVehicleView: View {
                         // Vehicle info fields
                         VStack(spacing: 14) {
                             FleetTextField(title: "VIN", text: $vin, placeholder: "17-character VIN")
-                            HStack(spacing: 14) {
-                                FleetTextField(title: "Make", text: $make, placeholder: "e.g. Tesla")
-                                FleetTextField(title: "Model", text: $model, placeholder: "e.g. Model 3")
+
+                            // Make picker
+                            FleetPickerField(title: "Make", selection: $make, prompt: "Select Make") {
+                                ForEach(VehicleCatalog.makes, id: \.self) { makeName in
+                                    Text(makeName).tag(makeName)
+                                }
                             }
+                            .onChange(of: make) { _, _ in
+                                // Reset model when make changes so the user
+                                // doesn't keep a model from a different make.
+                                model = ""
+                            }
+
+                            // Model picker (filtered by selected make)
+                            FleetPickerField(title: "Model", selection: $model, prompt: "Select Model") {
+                                ForEach(availableModels, id: \.self) { modelName in
+                                    Text(modelName).tag(modelName)
+                                }
+                            }
+                            .disabled(make.isEmpty)
+                            .opacity(make.isEmpty ? 0.5 : 1)
+
                             HStack(spacing: 14) {
-                                FleetTextField(title: "Year", text: $year, placeholder: "2024")
+                                // Year picker
+                                FleetPickerField(title: "Year", selection: $year, prompt: "Year") {
+                                    ForEach(VehicleCatalog.years, id: \.self) { yr in
+                                        Text(String(yr)).tag(yr)
+                                    }
+                                }
+
                                 FleetTextField(title: "Trim", text: $trim, placeholder: "Long Range")
                             }
                             HStack(spacing: 14) {
@@ -214,9 +240,9 @@ struct AddVehicleView: View {
         isSaving = true
 
         let vehicle = Vehicle(
-            make: make.trimmingCharacters(in: .whitespaces),
-            model: model.trimmingCharacters(in: .whitespaces),
-            year: Int(year) ?? 2024,
+            make: make,
+            model: model,
+            year: year,
             trim: trim.trimmingCharacters(in: .whitespaces),
             color: color.trimmingCharacters(in: .whitespaces),
             mileage: Int(mileage.replacingOccurrences(of: ",", with: "")) ?? 0,
@@ -243,6 +269,39 @@ struct AddVehicleView: View {
             }
             isSaving = false
             dismiss()
+        }
+    }
+}
+
+// MARK: - Reusable Form Components
+
+struct FleetPickerField<SelectionValue: Hashable, Content: View>: View {
+    let title: String
+    @Binding var selection: SelectionValue
+    let prompt: String
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title.uppercased())
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundColor(FleetTheme.textTertiary)
+                .kerning(1)
+            Picker(title, selection: $selection) {
+                content()
+            }
+            .pickerStyle(.menu)
+            .font(.system(size: 15))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(Color.white.opacity(0.8))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(Color.black.opacity(0.08), lineWidth: 1)
+            )
+            .tint(FleetTheme.textPrimary)
         }
     }
 }
